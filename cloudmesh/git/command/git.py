@@ -6,6 +6,7 @@ from cloudmesh.common.console import Console
 from cloudmesh.common.util import path_expand
 from pprint import pprint
 from cloudmesh.common.debug import VERBOSE
+from cloudmesh.common.parameter import Parameter
 
 class GitCommand(PluginCommand):
 
@@ -16,8 +17,7 @@ class GitCommand(PluginCommand):
         ::
 
           Usage:
-                git create issue BUNDLE --file=FILE [--org=ORG]
-                git create issue --repo=REPO FILE [--org=ORG]
+                git create issue --repo=REPO --title=TITLE --file=FILE [--org=ORG]
                 git create repo NAME FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repo --file=FILE [--org=ORG]
                 git list [MATCH] [--org=ORG]
@@ -42,12 +42,6 @@ class GitCommand(PluginCommand):
                 git list
 
                     lists the repos of the organization
-
-                git create issue BUNDLE FILE
-
-                   Create an issue in the given bundle.
-                   The bundle is defined in cloudmesh-installer
-                   The content of the issue is specified in the file
 
                 git create issue --repo=REPO FILE
                    Create an issue in the given repos.
@@ -91,4 +85,15 @@ class GitCommand(PluginCommand):
         #
         if arguments.list:
             m.list(arguments.MATCH)
+        elif arguments.create and arguments['--repo'] is not None:
+            """
+            git create issue --repo=REPO --title=TITLE --file=FILE [--org=ORG]
+            """
+            file = arguments['--file']
+            title = arguments['--title']
+            repo = arguments['--repo']
+            repos = Parameter.expand(repo)
+            m.issue(repos=repos, title=title, file=file)
+
+
         return ""
