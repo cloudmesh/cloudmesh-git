@@ -67,6 +67,17 @@ class GitCommand(PluginCommand):
 
                     reponame,lastname,firstname,githubid
 
+          Examples:
+
+               cms git list "Park"
+
+                  Lists all repos with the name Park in it or its description
+
+               cms git list "fa19-523"
+
+                    Lists all repos with the string  fa19-523 in its name
+
+
         """
         # arguments.FILE = arguments['--file'] or None
 

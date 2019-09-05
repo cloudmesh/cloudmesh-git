@@ -22,7 +22,6 @@ class Manager(object):
         self.ta_team = self.org.get_team(2631498)
 
 
-
     def list(self, match=None):
         for r in self.org.get_repos():
             if match is None:
