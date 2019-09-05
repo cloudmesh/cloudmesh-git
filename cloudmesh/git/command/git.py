@@ -1,5 +1,5 @@
 from __future__ import print_function
-from cloudmesh.shell.command import command
+from cloudmesh.shell.command import command, map_parameters
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.git.api.manager import Manager
 from cloudmesh.common.console import Console
@@ -77,6 +77,11 @@ class GitCommand(PluginCommand):
 
         VERBOSE(arguments)
 
+        map_parameters(arguments,
+                       'repo',
+                       'file',
+                       'title')
+
         m = Manager()
 
         # if arguments.FILE:
@@ -85,13 +90,13 @@ class GitCommand(PluginCommand):
         #
         if arguments.list:
             m.list(arguments.MATCH)
-        elif arguments.create and arguments['--repo'] is not None:
+        elif arguments.create and arguments.repo is not None:
             """
             git create issue --repo=REPO --title=TITLE --file=FILE [--org=ORG]
             """
-            file = arguments['--file']
-            title = arguments['--title']
-            repo = arguments['--repo']
+            file = arguments.file
+            title = arguments.title
+            repo = arguments.repo
             repos = Parameter.expand(repo)
             m.issue(repos=repos, title=title, file=file)
 
