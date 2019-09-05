@@ -6,6 +6,7 @@ from textwrap import dedent
 from pathlib import Path
 import time
 import csv
+from cloudmesh.common.util import readfile
 
 class Manager(object):
 
@@ -130,3 +131,13 @@ class Manager(object):
             ta_team.add_to_repos(repo)
             ta_team.set_repo_permission(repo, "write")
         '''
+
+    def issue(self, repos=None, title=None, file=None):
+        pprint(repos)
+        for repo in repos:
+            if file is not None:
+                content = readfile(file)
+                #repo.create_issue(title="This is a new issue", body=content)
+                print(file)
+                print(title, content)
+
