@@ -16,10 +16,11 @@ class GitCommand(PluginCommand):
         ::
 
           Usage:
-                git create issue BUNDLE FILE [--org=ORG]
+                git create issue BUNDLE --file=FILE [--org=ORG]
                 git create issue --repo=REPO FILE [--org=ORG]
                 git create repo NAME FIRSTNAME LASTNAME GITHUBID [--org=ORG]
-                git create repo --file=repos.csv [--org=ORG]
+                git create repo --file=FILE [--org=ORG]
+                git list [MATCH] [--org=ORG]
 
 
           This command does some useful things.
@@ -27,15 +28,20 @@ class GitCommand(PluginCommand):
           Arguments:
               FILE   a file name
               ORG    [default: cloudmesh-community]
+              MATCH  is a string that must occur in the repo name or description
+              --file=FILE   specify the file
+              --repo=REPO   the repository
 
           Options:
-              --file   specify the file
-              --repo   the repository
 
           Description:
 
                 The organization is set by default to
                 cloudmesh-community
+
+                git list
+
+                    lists the repos of the organization
 
                 git create issue BUNDLE FILE
 
@@ -66,15 +72,12 @@ class GitCommand(PluginCommand):
 
         VERBOSE(arguments)
 
-        # m = Manager()
+        m = Manager()
 
         # if arguments.FILE:
         #    print("option a")
         #    m.list(path_expand(arguments.FILE))
         #
-        # elif arguments.list:
-        #    print("option b")
-        #    m.list("just calling list without parameter")
-        #
-        Console.error("This is just a sample")
+        if arguments.list:
+            m.list(arguments.MATCH)
         return ""
