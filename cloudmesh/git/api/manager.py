@@ -108,7 +108,5 @@ class Manager(object):
         for repo in repos:
             if file is not None:
                 content = readfile(file)
-                #repo.create_issue(title="This is a new issue", body=content)
-                print(file)
-                print(title, content)
-
+                repository_obj = self.org.get_repo(repo)
+                repository_obj.create_issue(title=title, body=content)
