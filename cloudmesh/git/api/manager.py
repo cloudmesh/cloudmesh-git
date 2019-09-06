@@ -107,6 +107,11 @@ class Manager(object):
         pprint(repos)
         for repo in repos:
             if file is not None:
-                content = readfile(file)
+                content = readfile(file).strip()
+
+                if title is None:
+                    title = content.splitlines()[0]
+                    title = title.replace("#", "").strip()
+
                 repository_obj = self.org.get_repo(repo)
                 repository_obj.create_issue(title=title, body=content)
