@@ -17,7 +17,7 @@ class GitCommand(PluginCommand):
         ::
 
           Usage:
-                git create issue --repo=REPO --title=TITLE --file=FILE [--org=ORG]
+                git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
                 git list [MATCH] [--org=ORG]

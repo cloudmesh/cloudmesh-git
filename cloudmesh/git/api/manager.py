@@ -39,7 +39,7 @@ class Manager(object):
                      name=None,
                      community=None,
                      semester="fa19",
-                     githubid=None,
+                     githubid=None
                      ):
 
         description = f"{firstname} {lastname}"
