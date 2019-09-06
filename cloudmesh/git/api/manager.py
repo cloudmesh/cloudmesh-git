@@ -36,14 +36,14 @@ class Manager(object):
     def create_repo(self,
                      firstname=None,
                      lastname=None,
-                     repo=None,
+                     name=None,
                      community=None,
                      semester="fa19",
                      githubid=None,
                      ):
 
         description = f"{firstname} {lastname}"
-        repo = self.org.create_repo(repo,
+        repo = self.org.create_repo(name,
                                description=description,
                                license_template="apache-2.0")
         readme = dedent(f"""
@@ -51,7 +51,7 @@ class Manager(object):
                     owner:
                       firstname: "{firstname}"
                       lastname: "{lastname}"
-                      hid: "{repo}"
+                      hid: "{name}"
                       community: "{community}"
                       semester: "{semester}"
                     """).strip()
@@ -67,7 +67,7 @@ class Manager(object):
 
         # bug find file within distribution
 
-        with open(Path("../.gitignore").resolve()) as file:
+        with open(Path(".gitignore").resolve()) as file:
             gitignore = file.read()
 
         repo.create_file(".gitignore", "create the .gitignore", gitignore,
@@ -81,56 +81,27 @@ class Manager(object):
         self.ta_team.set_repo_permission(repo, "write")
 
 
-    def create_repos(self, filename):
+    def create_repos(self, filename=None):
 
-        with open('names.csv', newline='') as csvfile:
+        with open(filename, newline='') as csvfile:
             reader = csv.DictReader(csvfile, delimiter=',')
 
-            
             for row in reader:
-                print(row['first_name'], row['last_name'])
-
-        print ("create Repos")
-        '''
-        for r in repos:
-            name = r[0]
-            description = r[1]
-            firstname, lastname = description.split(" ", 1)
-            username = r[2]
-            print("creating", name, description)
-            repo = org.create_repo(name,
-                                   description=description,
-                                   license_template="apache-2.0")
-            readme = dedent(f"""
-                ---
-                owner:
-                  firstname: "{firstname}"
-                  lastname: "{lastname}"
-                  hid: "{name}"
-                  community: "523"
-                  semester: "fa19"
-                """).strip()
-
-            print(readme)
-            print("Add README.yaml")
-            repo.create_file("README.yml", "create the Readme.yaml", readme,
-                             branch="master")
-
-            print("Add .gitignore")
-
-            with open(Path("../.gitignore").resolve()) as file:
-                gitignore = file.read()
-
-            repo.create_file(".gitignore", "create the .gitignore", gitignore,
-                             branch="master")
-
-            try:
-                repo.add_to_collaborators(username, permission="write")
-            except Exception as e:
-                pass
-            ta_team.add_to_repos(repo)
-            ta_team.set_repo_permission(repo, "write")
-        '''
+                firstname = row['firstname']
+                lastname = row['lastname']
+                githubid = row['githubid']
+                community = row['community']
+                semester = row['semester']
+                name = row['repo']
+                print (f"Create: {name} {firstname} {lastname} {githubid}")
+                self.create_repo(
+                    firstname=firstname,
+                    lastname=lastname,
+                    name=name,
+                    community=community,
+                    semester=semester,
+                    githubid=githubid
+                )
 
     def issue(self, repos=None, title=None, file=None):
         pprint(repos)
