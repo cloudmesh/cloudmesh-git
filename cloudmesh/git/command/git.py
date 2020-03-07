@@ -8,6 +8,7 @@ from pprint import pprint
 from cloudmesh.common.debug import VERBOSE
 from cloudmesh.common.parameter import Parameter
 
+
 class GitCommand(PluginCommand):
 
     # noinspection PyUnusedLocal
@@ -81,7 +82,6 @@ class GitCommand(PluginCommand):
                        'title')
         VERBOSE(arguments)
 
-
         m = Manager()
 
         # if arguments.FILE:
@@ -103,6 +103,5 @@ class GitCommand(PluginCommand):
 
             filename = arguments.file
             m.create_repos(filename=filename)
-
 
         return ""

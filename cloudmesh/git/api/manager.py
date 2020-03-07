@@ -8,6 +8,7 @@ import time
 import csv
 from cloudmesh.common.util import readfile
 
+
 class Manager(object):
 
     def __init__(self, organization="cloudmesh-community"):
@@ -16,9 +17,9 @@ class Manager(object):
         g = Github(config["cloudmesh.github.user"],
                    config["cloudmesh.github.password"])
 
-
         if organization != "cloudmesh-community":
-            raise ValueError("currently we support only organization cloudmesh-community")
+            raise ValueError(
+                "currently we support only organization cloudmesh-community")
 
         self.org = g.get_organization(organization)
         self.ta_team = self.org.get_team(2631498)
@@ -26,26 +27,26 @@ class Manager(object):
     def list(self, match=None):
         for r in self.org.get_repos():
             if match is None:
-                print (r.name, r.description)
+                print(r.name, r.description)
             else:
                 name = r.name or ""
                 description = r.description or ""
                 if match in name or match in description:
-                    print (r.name, r.description)
+                    print(r.name, r.description)
 
     def create_repo(self,
-                     firstname=None,
-                     lastname=None,
-                     name=None,
-                     community=None,
-                     semester="fa19",
-                     githubid=None
-                     ):
+                    firstname=None,
+                    lastname=None,
+                    name=None,
+                    community=None,
+                    semester="fa19",
+                    githubid=None
+                    ):
 
         description = f"{firstname} {lastname}"
         repo = self.org.create_repo(name,
-                               description=description,
-                               license_template="apache-2.0")
+                                    description=description,
+                                    license_template="apache-2.0")
         readme = dedent(f"""
                     ---
                     owner:
@@ -80,7 +81,6 @@ class Manager(object):
         self.ta_team.add_to_repos(repo)
         self.ta_team.set_repo_permission(repo, "write")
 
-
     def create_repos(self, filename=None):
 
         with open(filename, newline='') as csvfile:
@@ -93,7 +93,7 @@ class Manager(object):
                 community = row['community']
                 semester = row['semester']
                 name = row['repo']
-                print (f"Create: {name} {firstname} {lastname} {githubid}")
+                print(f"Create: {name} {firstname} {lastname} {githubid}")
                 self.create_repo(
                     firstname=firstname,
                     lastname=lastname,
