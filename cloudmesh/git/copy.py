@@ -97,7 +97,7 @@ def copy_dir(original="cloudmesh/cloudmesh-cloud",
     script = textwrap.dedent(f"""
     git remote add {branch} ../{dir_original}
     git fetch {branch}
-    git branch {branch} remotes/{branch}/master
+    git branch {branch} remotes/{branch}/main
     git merge {branch} --allow-unrelated-histories
 
     git remote rm {branch}
@@ -113,5 +113,5 @@ def copy_dir(original="cloudmesh/cloudmesh-cloud",
 
     print("Now do:")
     print()
-    print(f"cd tmp/{dir_destination}; git push origin master")
+    print(f"cd tmp/{dir_destination}; git push origin main")
     print()

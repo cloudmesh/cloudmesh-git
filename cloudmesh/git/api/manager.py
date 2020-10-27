@@ -62,7 +62,7 @@ class Manager(object):
         repo.create_file("README.yml",
                          "Create the Readme.yml",
                          readme,
-                         branch="master")
+                         branch="main")
 
         print("Add .gitignore")
 
@@ -72,7 +72,7 @@ class Manager(object):
             gitignore = file.read()
 
         repo.create_file(".gitignore", "create the .gitignore", gitignore,
-                         branch="master")
+                         branch="main")
 
         try:
             repo.add_to_collaborators(githubid, permission="write")

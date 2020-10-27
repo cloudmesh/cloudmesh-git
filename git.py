@@ -121,7 +121,7 @@ for r in repos:
     print(readme)
     print("Add README.yaml")
     repo.create_file("README.yml", "create the Readme.yaml", readme,
-                     branch="master")
+                     branch="main")
 
     print("Add .gitignore")
 
@@ -129,7 +129,7 @@ for r in repos:
         gitignore = file.read()
 
     repo.create_file(".gitignore", "create the .gitignore", gitignore,
-                     branch="master")
+                     branch="main")
 
     try:
         repo.add_to_collaborators(username, permission="write")
