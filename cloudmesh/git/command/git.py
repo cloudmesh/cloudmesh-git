@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from cloudmesh.common.debug import VERBOSE
 from cloudmesh.common.parameter import Parameter
 from cloudmesh.git.api.manager import Manager
