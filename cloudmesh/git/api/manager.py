@@ -7,15 +7,21 @@ from pathlib import Path
 import time
 import csv
 from cloudmesh.common.util import readfile
-
-
+from cloudmesh.common.console import Console
+import os
 class Manager(object):
 
     def __init__(self, organization="cloudmesh-community"):
         config = Config()
 
-        g = Github(config["cloudmesh.github.user"],
-                   config["cloudmesh.github.password"])
+        try:
+            g = Github(config["cloudmesh.github.user"],
+                       config["cloudmesh.github.password"])
+        except KeyError:
+            Console.error("Make sure the cloudmesh.yaml file defines both \n"
+                          "         cloudmesh.github.user\n"
+                          "         cloudmesh.github.password")
+            raise ValueError("cloudmesh.github")
 
         if organization != "cloudmesh-community":
             raise ValueError(
@@ -24,8 +30,14 @@ class Manager(object):
         self.org = g.get_organization(organization)
         self.ta_team = self.org.get_team(2631498)
 
-    def list(self, match=None):
-        for r in self.org.get_repos():
+    def list(self, match=None, verbose=False):
+        Manager._list(self.org, match=match, verbose=verbose)
+
+    @staticmethod
+    def _list(org, match=None, verbose=False):
+        if verbose:
+            Console.msg(f"Organization: {org}")
+        for r in org.get_repos():
             if match is None:
                 print(r.name, r.description)
             else:
@@ -33,6 +45,70 @@ class Manager(object):
                 description = r.description or ""
                 if match in name or match in description:
                     print(r.name, r.description)
+
+
+
+    @staticmethod
+    def _create_empty_repo(
+                          org,
+                          name,
+                          source="",
+                          ):
+        try:
+            repo = org.create_repo(name)
+        except Exception as e:
+            msg = e._GithubException__data["message"] + "  " + \
+                  e._GithubException__data["errors"][0]["message"].capitalize() +"."
+            Console.error (msg)
+            raise e
+        #mirror = dedent(f'''
+        #                ---
+        #                 mirror:
+        #                   org: "{org.__dict__}"
+        #                   source: "{source}"
+        #                   name: "{name}"
+        #                 ''').strip()
+        #print(mirror)
+
+
+    @staticmethod
+    def mirror(
+             orgfrom=None,
+             orgto=None,
+             repo=None,
+             verbose=False,
+             force=False):
+
+        config = Config()
+        g = Github(config["cloudmesh.github.token"])
+
+        org = g.get_organization(orgto)
+
+        print (org)
+        #  Manager._list(org)
+
+        #print ("KKKK")
+        try:
+            Manager._create_empty_repo(org, repo, source=orgfrom)
+        except:
+            Console.error(f"mirror failed: {orgfrom}/{repo} -> {orgto}/{repo}")
+            if not force:
+                return ""
+
+        script = dedent(f"""
+        cd /tmp; rm -rf {repo}.git
+        cd /tmp; git clone --mirror https://github.com/{orgfrom}/{repo}.git
+        cd /tmp/{repo}.git
+        cd /tmp/{repo}.git; git remote set-url --push origin https://github.com/{orgto}/{repo}
+        cd /tmp/{repo}.git; git fetch -p origin
+        cd /tmp/{repo}.git; git push --mirror
+        cd /tmp; rm -rf {repo}.git
+        """).strip()
+        for line in script.split("\n"):
+            os.system(line)
+
+
+
 
     def create_repo(self,
                     firstname=None,

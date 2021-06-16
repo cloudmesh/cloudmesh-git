@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from cloudmesh.common.debug import VERBOSE
 from cloudmesh.common.parameter import Parameter
 from cloudmesh.git.api.manager import Manager
@@ -20,8 +18,9 @@ class GitCommand(PluginCommand):
                 git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
-                git list [MATCH] [--org=ORG]
+                git list [MATCH] [--org=ORG] [--verbose]
                 git copy FROM TO DIRS... [--move=TMP]
+                git mirror --from=ORGFROM --to=ORGTO --repo=REPO [--force]
 
           This command does some useful things.
 
@@ -34,6 +33,8 @@ class GitCommand(PluginCommand):
 
 
           Options:
+              --verbose  show additional output [default: False]
+              --force    ignore if the repo is already created [default: False]
 
           Description:
 
@@ -87,6 +88,10 @@ class GitCommand(PluginCommand):
 
                     Lists all repos with the string  fa19-523 in its name
 
+               cms git mirror --from=cloudmesh-community --to=cybertraining-dsc --repo=boat --force
+
+                    creates a mirror of the specified repo
+                    force is used to continue even if the repo already exists
 
         """
         # arguments.FILE = arguments['--file'] or None
@@ -99,7 +104,8 @@ class GitCommand(PluginCommand):
                        'title')
         move = arguments.move or "move"
 
-        VERBOSE(arguments)
+        arguments.verbose = arguments["--verbose"]
+        # VERBOSE(arguments)
 
 
         # if arguments.FILE:
@@ -107,17 +113,34 @@ class GitCommand(PluginCommand):
         #    m.list(path_expand(arguments.FILE))
         #
         if arguments.list:
+            try:
+                m = Manager()
+            except ValueError:
+                return ""
 
-            m = Manager()
+            m.list(arguments.MATCH, verbose=arguments.verbose)
 
-            m.list(arguments.MATCH)
+        elif arguments.mirror:
+            try:
+                m = Manager()
+            except ValueError:
+                return ""
+
+            m.mirror(orgfrom=arguments["--from"],
+                     orgto=arguments["--to"],
+                     repo=arguments["--repo"],
+                     verbose=arguments["--verbose"],
+                     force=arguments["--force"])
+            print()
 
         elif arguments.create and arguments.repo is not None:
             """
             git create issue --repo=REPO --title=TITLE --file=FILE [--org=ORG]
             """
-            m = Manager()
-
+            try:
+                m = Manager()
+            except ValueError:
+                return ""
             file = arguments.file
             title = arguments.title
             repo = arguments.repo
@@ -126,7 +149,10 @@ class GitCommand(PluginCommand):
 
         elif arguments.repository and arguments.file and not arguments.issue:
 
-            m = Manager()
+            try:
+                m = Manager()
+            except ValueError:
+                return ""
             filename = arguments.file
             m.create_repos(filename=filename)
 
