@@ -4,7 +4,7 @@ from cloudmesh.git.api.manager import Manager
 from cloudmesh.git.copy import copy_dir
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.shell.command import command, map_parameters
-
+import os
 
 class GitCommand(PluginCommand):
 
@@ -20,7 +20,7 @@ class GitCommand(PluginCommand):
                 git create repository --file=FILE [--org=ORG]
                 git list [MATCH] [--org=ORG]
                 git copy FROM TO DIRS... [--move=TMP]
-                git set ssh
+                git set ssh [DIRS]
 
           This command does some useful things.
 
@@ -146,9 +146,16 @@ class GitCommand(PluginCommand):
 
         elif arguments.ssh and arguments.set:
 
+            dirs = arguments["DIRS"] or "."
             org = "get the org from the current dir in .git"
             repo = "get the repo from the current dir in .git"
 
-            os.system(f"git remote set-url origin git@github.com:{org}/{repo}.git")
+
+            for d in dirs:
+                if d == ".":
+                    location = ""
+                else:
+                    location = "cd {d}; "
+            os.system(f"{location} git remote set-url origin git@github.com:{org}/{repo}.git")
 
         return ""
