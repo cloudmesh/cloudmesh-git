@@ -20,6 +20,7 @@ class GitCommand(PluginCommand):
                 git create repository --file=FILE [--org=ORG]
                 git list [MATCH] [--org=ORG]
                 git copy FROM TO DIRS... [--move=TMP]
+                git set ssh
 
           This command does some useful things.
 
@@ -37,6 +38,9 @@ class GitCommand(PluginCommand):
 
                 The organization is set by default to
                 cloudmesh-community
+
+                git set ssh
+                    switches the repository to use ssh
 
                 git list
 
@@ -140,5 +144,11 @@ class GitCommand(PluginCommand):
                      directories=dirs,
                      move=move)
 
+        elif arguments.ssh and arguments.set:
+
+            org = "get the org from the current dir in .git"
+            repo = "get the repo from the current dir in .git"
+
+            os.system(f"git remote set-url origin git@github.com:{org}/{repo}.git")
 
         return ""
