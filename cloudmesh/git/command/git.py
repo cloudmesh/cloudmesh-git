@@ -21,6 +21,8 @@ class GitCommand(PluginCommand):
                 git list [MATCH] [--org=ORG]
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
+                cms git --refresh # redirects automatically to ~/cloudmesh/git/repo-list.txt
+                cms git clone --all # uses automatically ~/cloudmesh/git/repo-list.txt
 
           This command does some useful things.
 
@@ -38,6 +40,17 @@ class GitCommand(PluginCommand):
 
                 The organization is set by default to
                 cloudmesh-community
+
+                cms git --refresh
+                    inds all organizations and repositories the current user belongs to
+                    redirects automatically to ~/cloudmesh/git/repo-list.txt
+
+                cms git clone --all
+                    uses all organizations and repositories of the user and
+                    clones them into the current directory, while making each
+                    organization in its own subdirectory
+                    uses automatically ~/cloudmesh/git/repo-list.txt
+                    which can be created with cms git --refresh
 
                 git set ssh
                     switches the repository to use ssh
