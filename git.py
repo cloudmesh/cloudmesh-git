@@ -7,7 +7,16 @@ from pathlib import Path
 import time
 
 repos = [
-#    ["fa19-523-180", "Jonathon Grant","jongrant010"],
+# ["su21-reu-360","Carlos Theran", "CarlosTheran"],
+ ["su21-reu-361","Jacques Fleischer","stapmoshun"],
+ ["su21-reu-362","Kehinde Ezekiel","kehinde-ezekiel"],
+ ["su21-reu-363","Whitney McNair","ohthatswhit"],
+ ["su21-reu-364","David Umanzor","Zarthanix"],
+ ["su21-reu-365","Victor Adankai","VictorWealth"]
+
+
+
+    #    ["fa19-523-180", "Jonathon Grant","jongrant010"],
 #    ["fa19-523-181", "Max Falkenstein","maxf7399"],
 #    ["fa19-523-182", "Zak Siddiqui","zaksidd1"],
 #    ["fa19-523-183", "Brent Creech","bcreech40"],
@@ -59,6 +68,7 @@ repos = [
 #["fa19-516-157", "Chenxu Wang",	"wang542"],
 #["fa19-516-158", "Daivik Dayanand", "Daivik1997"]
 #    ["fa19-516-000", "Gregor von Laszewski", "laszewsk"]
+
 ]
 
 config = Config()
@@ -115,8 +125,8 @@ for r in repos:
           firstname: "{firstname}"
           lastname: "{lastname}"
           hid: "{name}"
-          community: "523"
-          semester: "fa19"
+          community: "reu"
+          semester: "su21"
         """).strip()
     print(readme)
     print("Add README.yaml")
