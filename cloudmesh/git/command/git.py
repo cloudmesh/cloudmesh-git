@@ -12,6 +12,7 @@ from cloudmesh.shell.command import command, map_parameters
 from cloudmesh.common.Shell import Shell
 import os
 import json
+import glob
 from pprint import pprint
 
 class GitCommand(PluginCommand):
@@ -32,6 +33,7 @@ class GitCommand(PluginCommand):
                 git set ssh [DIRS]
                 git --refresh
                 git clone all
+                git pull all
 
           This command does some useful things.
 
@@ -68,7 +70,6 @@ class GitCommand(PluginCommand):
                 git list
                     lists the repos of the organization
 
-
                 git list all
                     gets info of all repos of the current logged in user to github
                     put the result in ~/.cloudmesh/gitcache.txt
@@ -93,6 +94,10 @@ class GitCommand(PluginCommand):
 
                 git copy FROM TO
                     copies a directory from one repo to the other
+
+                git pull all
+                    git pulls all directories and subdirectories of
+                    current working directory
 
           Examples:
 
@@ -206,18 +211,6 @@ class GitCommand(PluginCommand):
             filename = arguments.file
             m.create_repos(filename=filename)
 
-        elif arguments.copy:
-
-            dirs = arguments.DIRS
-            original = arguments.FROM
-            destination = arguments.TO
-            move = arguments.move
-
-            copy_dir(original=original,
-                     destination=destination,
-                     directories=dirs,
-                     move=move)
-
         elif arguments.ssh and arguments.set:
 
             dirs = arguments["DIRS"] or "."
@@ -231,5 +224,22 @@ class GitCommand(PluginCommand):
                 else:
                     location = "cd {d}; "
             os.system(f"{location} git remote set-url origin git@github.com:{org}/{repo}.git")
+
+        elif arguments.pull and arguments.all:
+            for path in glob.glob(f'./**/', recursive=True):
+                command = f"git -C {path} pull"
+                banner(command)
+                os.system(command)
+
+        elif arguments.copy:
+            dirs = arguments.DIRS
+            original = arguments.FROM
+            destination = arguments.TO
+            move = arguments.move
+
+            copy_dir(original=original,
+                     destination=destination,
+                     directories=dirs,
+                     move=move)
 
         return ""
