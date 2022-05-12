@@ -26,12 +26,12 @@ class GitCommand(PluginCommand):
                 git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
-                git list all
+                git list all [--exclude=ORG]
                 git list [MATCH] [--org=ORG]
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
                 git --refresh
-                git clone --all
+                git clone all
 
           This command does some useful things.
 
@@ -55,12 +55,12 @@ class GitCommand(PluginCommand):
                     inds all organizations and repositories the current user belongs to
                     redirects automatically to ~/cloudmesh/git/repo-list.txt
 
-                git clone --all
+                git clone all
                     uses all organizations and repositories of the user and
                     clones them into the current directory, while making each
                     organization in its own subdirectory
                     uses automatically ~/cloudmesh/git/repo-list.txt
-                    which can be created with cms git --refresh
+                    which can be created with cms git list all
 
                 git set ssh
                     switches the repository to use ssh
@@ -145,11 +145,14 @@ class GitCommand(PluginCommand):
 
             result2 = json.dumps(result,indent=2)
             #pprint(result2)
+            exclude = Parameter.expand(arguments.exclude) or []
             organizations = []
+
             for entry in result:
                 url = entry["organization_url"]
                 name = os.path.basename(url)
-                organizations.append(name)
+                if name not in exclude:
+                    organizations.append(name)
 
             #pprint(organizations)
             repos = []
@@ -174,12 +177,14 @@ class GitCommand(PluginCommand):
 
         #    m.list(arguments.MATCH)'''
 
-        elif arguments.clone and arguments["--all"]:
+        elif arguments.clone and arguments["all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             repos = readfile(filename).splitlines()
             for repo in repos:
                 url = f"git@github.com:{repo}.git"
-                command = f"git clone {url}"
+                org = os.path.dirname(repo)
+                name = os.path.basename(repo)
+                command = f"mkdir -p {org}; cd {org}; git clone {url}"
                 banner(command)
                 os.system(command)
 
