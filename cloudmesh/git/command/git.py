@@ -13,6 +13,7 @@ from cloudmesh.common.Shell import Shell
 import os
 import json
 import glob
+import subprocess
 from pprint import pprint
 
 class GitCommand(PluginCommand):
@@ -211,13 +212,23 @@ class GitCommand(PluginCommand):
         elif arguments.clone and arguments["all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             repos = readfile(filename).splitlines()
+            failed_repos = []
             for repo in repos:
                 url = f"git@github.com:{repo}.git"
                 org = os.path.dirname(repo)
                 name = os.path.basename(repo)
                 command = f"mkdir -p {org}; cd {org}; git clone {url}"
                 banner(command)
-                r = Shell.run(command)
+                try:
+                    r = Shell.run(command)
+                except subprocess.CalledProcessError as e:
+                    Console.error(f"Failed to clone {repo}. Continuing...")
+                    failed_repos.append(repo)
+                    continue
+            if failed_repos:
+                Console.error(f"These repos failed to clone:\n")
+                for failed_repo in failed_repos:
+                    print(f'{failed_repo}\n')
 
         elif arguments.create and arguments.repo is not None:
             """
