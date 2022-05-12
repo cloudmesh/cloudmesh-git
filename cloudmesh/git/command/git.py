@@ -4,6 +4,7 @@ from cloudmesh.common.util import writefile
 from cloudmesh.common.util import readfile
 from cloudmesh.common.util import path_expand
 from cloudmesh.common.util import banner
+from cloudmesh.common.util import str_bool
 from cloudmesh.common.console import Console
 from cloudmesh.git.api.manager import Manager
 from cloudmesh.git.copy import copy_dir
@@ -33,7 +34,7 @@ class GitCommand(PluginCommand):
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
                 git --refresh
-                git clone all
+                git clone all [--force=no]
                 git pull all
 
           This command does some useful things.
@@ -47,6 +48,7 @@ class GitCommand(PluginCommand):
 
 
           Options:
+              --force=no    pull the repository if it already exists in current working directory [default: no]
 
           Description:
 
@@ -57,12 +59,13 @@ class GitCommand(PluginCommand):
                     inds all organizations and repositories the current user belongs to
                     redirects automatically to ~/cloudmesh/git/repo-list.txt
 
-                git clone all
+                git clone all [--force=no]
                     uses all organizations and repositories of the user and
                     clones them into the current directory, while making each
                     organization in its own subdirectory
                     uses automatically ~/cloudmesh/git/repo-list.txt
-                    which can be created with cms git list all
+                    which can be created with cms git list all.
+                    if force is yes then it pulls preexisting directories
 
                 git set ssh
                     switches the repository to use ssh
@@ -213,6 +216,7 @@ class GitCommand(PluginCommand):
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             repos = readfile(filename).splitlines()
             failed_repos = []
+            forcing_pull = str_bool(arguments["--force"])
             for repo in repos:
                 url = f"git@github.com:{repo}.git"
                 org = os.path.dirname(repo)
@@ -221,9 +225,25 @@ class GitCommand(PluginCommand):
                 banner(command)
                 try:
                     r = Shell.run(command)
+                    Console.ok(f"Successfully cloned {repo}.")
                 except subprocess.CalledProcessError as e:
-                    Console.error(f"Failed to clone {repo}. Continuing...")
-                    failed_repos.append(repo)
+                    if forcing_pull:
+                        if "already exists and is not an empty directory" in str(e.output):
+                            pull_command = f"cd {org}; cd {name}; git pull"
+                            banner(pull_command)
+                            try:
+                                r2 = Shell.run(pull_command)
+                                Console.ok(f"Pulled {repo} since it already exists.")
+                            except subprocess.CalledProcessError as e2:
+                                Console.error(f"Failed to pull {repo}. Continuing...")
+                                failed_repos.append(repo)
+                                continue
+                    else:
+                        if "already exists and is not an empty directory" in str(e.output):
+                            Console.ok(f"Skipping {repo} because it already exists.")
+                        else:
+                            Console.error(f"Failed to clone {repo}. Continuing...")
+                            failed_repos.append(repo)
                     continue
             if failed_repos:
                 Console.error(f"These repos failed to clone:\n")
