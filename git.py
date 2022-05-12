@@ -8,7 +8,7 @@ import time
 
 repos = [
 # ["su21-reu-360","Carlos Theran", "CarlosTheran"],
- ["su21-reu-361","Jacques Fleischer","stapmoshun"],
+ ["su21-reu-361","Jacques Fleischer","jpfleischer"],
  ["su21-reu-362","Kehinde Ezekiel","kehinde-ezekiel"],
  ["su21-reu-363","Whitney McNair","ohthatswhit"],
  ["su21-reu-364","David Umanzor","Zarthanix"],
