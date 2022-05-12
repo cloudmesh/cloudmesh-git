@@ -1,10 +1,16 @@
 from cloudmesh.common.debug import VERBOSE
 from cloudmesh.common.parameter import Parameter
+from cloudmesh.common.Shell import Shell
+from cloudmesh.common.console import Console
+from cloudmesh.common.util import str_bool
 from cloudmesh.git.api.manager import Manager
 from cloudmesh.git.copy import copy_dir
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.shell.command import command, map_parameters
+from github import Github
 import os
+import requests
+import json
 
 class GitCommand(PluginCommand):
 
@@ -18,7 +24,7 @@ class GitCommand(PluginCommand):
                 git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
-                git list [MATCH] [--org=ORG]
+                git list HANDLE [--forks=no] [--archived=no]
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
                 cms git --refresh # redirects automatically to ~/cloudmesh/git/repo-list.txt
@@ -27,14 +33,17 @@ class GitCommand(PluginCommand):
           This command does some useful things.
 
           Arguments:
-              FILE   a file name
-              ORG    [default: cloudmesh-community]
-              MATCH  is a string that must occur in the repo name or description
-              --file=FILE   specify the file
-              --repo=REPO   the repository
+              FILE           a file name
+              ORG            [default: cloudmesh-community]
+              MATCH          is a string that must occur in the repo name or description
+              HANDLE         username or organization name on github
+              --file=FILE    specify the file
+              --repo=REPO    the repository
 
 
           Options:
+              --forks=no     include forked repos in list. if no, then don't include forks [default: no]
+              --archived=no  include archived repos in list. if no, then don't include archived [default: no]
 
           Description:
 
@@ -42,7 +51,7 @@ class GitCommand(PluginCommand):
                 cloudmesh-community
 
                 cms git --refresh
-                    inds all organizations and repositories the current user belongs to
+                    finds all organizations and repositories the current user belongs to
                     redirects automatically to ~/cloudmesh/git/repo-list.txt
 
                 cms git clone --all
@@ -55,9 +64,8 @@ class GitCommand(PluginCommand):
                 git set ssh
                     switches the repository to use ssh
 
-                git list
-
-                    lists the repos of the organization
+                git list HANDLE [--forks=no] [--archived=no]
+                    lists the repos of the user and/or organization
 
                 git create issue --repo=REPO FILE
                    Create an issue in the given repos.
@@ -111,7 +119,9 @@ class GitCommand(PluginCommand):
                        'move',
                        'repo',
                        'file',
-                       'title')
+                       'title',
+                       'forks',
+                       'archived')
         move = arguments.move or "move"
 
         VERBOSE(arguments)
@@ -122,10 +132,50 @@ class GitCommand(PluginCommand):
         #    m.list(path_expand(arguments.FILE))
         #
         if arguments.list:
-
+            '''
             m = Manager()
 
             m.list(arguments.MATCH)
+            '''
+
+            req = requests.get(f'https://api.github.com/users/{arguments.HANDLE}')
+            if req.status_code == 404:
+                Console.error(f"User {arguments.HANDLE} does not exist!")
+                return
+            is_getting_forks = str_bool(arguments.forks)
+            is_getting_archived = str_bool(arguments.archived)
+
+            my_dir = os.path.expanduser('~/.cloudmesh/git/')
+            if not os.path.isdir(my_dir):
+                os.mkdir(my_dir)
+            command = f"curl -o {my_dir}repo-list-{arguments.HANDLE}.json " \
+                      f"https://api.github.com/users/{arguments.HANDLE}/repos"
+            r = Shell.run(command)
+
+            # open json file
+            f = open(f'{my_dir}repo-list-{arguments.HANDLE}.json')
+            # make a dictionary
+            dict_data = json.load(f)
+
+            repos = []
+            # print repos
+            for i in dict_data:
+                if not is_getting_forks:
+                    if (i["fork"]):
+                        continue
+                if not is_getting_archived:
+                    if (i["archived"]):
+                        continue
+                repos.append(i["name"])
+                print(i["name"])
+
+            print(repos)
+            with open(f'{my_dir}repo-list-{arguments.HANDLE}.txt', 'w') as file2:
+                for item in repos:
+                    file2.write("%s\n" % item)
+            Console.ok(f'\nWritten list of repos to {my_dir}repo-list-{arguments.HANDLE}.txt')
+            f.close()
+            file2.close()
 
         elif arguments.create and arguments.repo is not None:
             """
