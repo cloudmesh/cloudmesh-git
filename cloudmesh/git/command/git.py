@@ -1,10 +1,18 @@
 from cloudmesh.common.debug import VERBOSE
 from cloudmesh.common.parameter import Parameter
+from cloudmesh.common.util import writefile
+from cloudmesh.common.util import readfile
+from cloudmesh.common.util import path_expand
+from cloudmesh.common.util import banner
+from cloudmesh.common.console import Console
 from cloudmesh.git.api.manager import Manager
 from cloudmesh.git.copy import copy_dir
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.shell.command import command, map_parameters
+from cloudmesh.common.Shell import Shell
 import os
+import json
+from pprint import pprint
 
 class GitCommand(PluginCommand):
 
@@ -18,11 +26,12 @@ class GitCommand(PluginCommand):
                 git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
-                git list [MATCH] [--org=ORG]
+                git newlist [--all]
+                git newlist [MATCH] [--org=ORG]
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
-                cms git --refresh # redirects automatically to ~/cloudmesh/git/repo-list.txt
-                cms git clone --all # uses automatically ~/cloudmesh/git/repo-list.txt
+                git --refresh
+                git clone --all
 
           This command does some useful things.
 
@@ -35,17 +44,18 @@ class GitCommand(PluginCommand):
 
 
           Options:
+              --all  gets info of all repos of the current logged in user to github
 
           Description:
 
                 The organization is set by default to
                 cloudmesh-community
 
-                cms git --refresh
+                git --refresh
                     inds all organizations and repositories the current user belongs to
                     redirects automatically to ~/cloudmesh/git/repo-list.txt
 
-                cms git clone --all
+                git clone --all
                     uses all organizations and repositories of the user and
                     clones them into the current directory, while making each
                     organization in its own subdirectory
@@ -56,8 +66,11 @@ class GitCommand(PluginCommand):
                     switches the repository to use ssh
 
                 git list
-
                     lists the repos of the organization
+
+
+                git list --all
+                    gets info of all repos of the current logged in user to github
 
                 git create issue --repo=REPO FILE
                    Create an issue in the given repos.
@@ -89,16 +102,16 @@ class GitCommand(PluginCommand):
                     creates a script move.sh that copies the directory admin
                     with history to the cloudmesh-db repo into a folder move
 
-                    from there you can use git mv to place the content wher eyou
+                    from there you can use git mv to place the content where you
                     like. The reason we put it in move is that there may be another
                     dir already in it with tha name.
 
 
-               cms git list "Park"
+               git list "Park"
 
                   Lists all repos with the name Park in it or its description
 
-               cms git list "fa19-523"
+               git list "fa19-523"
 
                     Lists all repos with the string  fa19-523 in its name
 
@@ -111,7 +124,8 @@ class GitCommand(PluginCommand):
                        'move',
                        'repo',
                        'file',
-                       'title')
+                       'title'
+                       )
         move = arguments.move or "move"
 
         VERBOSE(arguments)
@@ -121,11 +135,54 @@ class GitCommand(PluginCommand):
         #    print("option a")
         #    m.list(path_expand(arguments.FILE))
         #
-        if arguments.list:
 
-            m = Manager()
+        if arguments["newlist"] and arguments["--all"]:
 
-            m.list(arguments.MATCH)
+            command = "gh api  /user/memberships/orgs"
+            r = Shell.run(command)
+            print(r)
+            # os.system(f"start cmd /k {command}")
+            result = json.loads(r)
+
+            result2 = json.dumps(result,indent=2)
+            pprint(result2)
+            organizations = []
+            for entry in result:
+                url = entry["organization_url"]
+                name = os.path.basename(url)
+                #url = f"git@github.com:{name}.git"
+                organizations.append(name)
+
+            pprint(organizations)
+            repos = []
+            for org in organizations:
+                command = f"gh repo list {org} -L 1000"
+                r = Shell.run(command)
+                print(r)
+                lines = [x.split()[0] for x in r.splitlines()]
+                print(lines)
+                repos = repos + lines
+            pprint(repos)
+
+            filename = path_expand("~/.cloudmesh/git_cache.txt")
+            writefile(filename,"\n".join(repos))
+            Console.ok(f'\nWritten list of repos to {filename}')
+
+        elif arguments["newlist"]:
+
+            print('hi')
+            '''m = Manager()
+
+            m.list(arguments.MATCH)'''
+
+        elif arguments.clone and arguments["--all"]:
+            filename = path_expand("~/.cloudmesh/git_cache.txt")
+            repos = readfile(filename).splitlines()
+            for repo in repos:
+                url = f"git@github.com:{repo}.git"
+                command = f"git clone {url}"
+                banner(command)
+                os.system(command)
 
         elif arguments.create and arguments.repo is not None:
             """
