@@ -13,6 +13,8 @@ from cloudmesh.common.util import HEADING
 @pytest.mark.incremental
 class TestGit:
 
+    # export GITUSER=laszewski
+    # gituser = os.environ["GITUSER"]
     def test_help(self):
         HEADING()
         Benchmark.Start()
