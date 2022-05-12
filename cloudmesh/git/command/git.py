@@ -28,7 +28,7 @@ class GitCommand(PluginCommand):
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
                 git list all [--exclude=ORG]
-                git list [MATCH] [--org=ORG]
+                git list --org=ORG [MATCH]
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
                 git --refresh
@@ -46,7 +46,6 @@ class GitCommand(PluginCommand):
 
 
           Options:
-              --all  gets info of all repos of the current logged in user to github
 
           Description:
 
@@ -67,12 +66,14 @@ class GitCommand(PluginCommand):
                 git set ssh
                     switches the repository to use ssh
 
-                git list
+                git list --org=ORG
                     lists the repos of the organization
 
-                git list all
+                git list all [--exclude=ORG]
                     gets info of all repos of the current logged in user to github
                     put the result in ~/.cloudmesh/gitcache.txt
+                    to exclude an organization, add it to the end of exclude
+                    parameter
 
                 git create issue --repo=REPO FILE
                    Create an issue in the given repos.
@@ -150,7 +151,7 @@ class GitCommand(PluginCommand):
 
             result2 = json.dumps(result,indent=2)
             #pprint(result2)
-            exclude = Parameter.expand(arguments.exclude) or []
+            exclude = Parameter.expand(arguments["--exclude"]) or []
             organizations = []
 
             for entry in result:
@@ -177,10 +178,35 @@ class GitCommand(PluginCommand):
 
         #elif arguments["list"]:
 
-        #    print('hi')
         #    '''m = Manager()
 
         #    m.list(arguments.MATCH)'''
+
+        elif arguments.list and arguments["--org"]:
+            command = f'gh api  /orgs/{arguments["--org"]}/repos'
+            r = Shell.run(command)
+            # print(r)
+
+            result = json.loads(r)
+
+            result2 = json.dumps(result, indent=2)
+            # pprint(result2)
+
+            repos = []
+
+            result2 = json.dumps(result, indent=2)
+            pprint(result2)
+
+            for entry in result:
+                name = entry["full_name"]
+                repos.append(name)
+
+            # pprint(organizations)
+
+            pprint(repos)
+            filename = path_expand("~/.cloudmesh/git_cache.txt")
+            writefile(filename, "\n".join(repos))
+            Console.ok(f'\nWritten list of repos to {filename}')
 
         elif arguments.clone and arguments["all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
@@ -191,7 +217,7 @@ class GitCommand(PluginCommand):
                 name = os.path.basename(repo)
                 command = f"mkdir -p {org}; cd {org}; git clone {url}"
                 banner(command)
-                os.system(command)
+                r = Shell.run(command)
 
         elif arguments.create and arguments.repo is not None:
             """
