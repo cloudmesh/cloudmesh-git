@@ -26,8 +26,8 @@ class GitCommand(PluginCommand):
                 git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
-                git newlist [--all]
-                git newlist [MATCH] [--org=ORG]
+                git list all
+                git list [MATCH] [--org=ORG]
                 git copy FROM TO DIRS... [--move=TMP]
                 git set ssh [DIRS]
                 git --refresh
@@ -69,8 +69,9 @@ class GitCommand(PluginCommand):
                     lists the repos of the organization
 
 
-                git list --all
+                git list all
                     gets info of all repos of the current logged in user to github
+                    put the result in ~/.cloudmesh/gitcache.txt
 
                 git create issue --repo=REPO FILE
                    Create an issue in the given repos.
@@ -106,13 +107,10 @@ class GitCommand(PluginCommand):
                     like. The reason we put it in move is that there may be another
                     dir already in it with tha name.
 
-
-               git list "Park"
-
+               git list Park
                   Lists all repos with the name Park in it or its description
 
-               git list "fa19-523"
-
+               git list fa19-523
                     Lists all repos with the string  fa19-523 in its name
 
 
@@ -136,44 +134,45 @@ class GitCommand(PluginCommand):
         #    m.list(path_expand(arguments.FILE))
         #
 
-        if arguments["newlist"] and arguments["--all"]:
+        if arguments.list and arguments.all:
+
 
             command = "gh api  /user/memberships/orgs"
             r = Shell.run(command)
-            print(r)
-            # os.system(f"start cmd /k {command}")
+            # print(r)
+
             result = json.loads(r)
 
             result2 = json.dumps(result,indent=2)
-            pprint(result2)
+            #pprint(result2)
             organizations = []
             for entry in result:
                 url = entry["organization_url"]
                 name = os.path.basename(url)
-                #url = f"git@github.com:{name}.git"
                 organizations.append(name)
 
-            pprint(organizations)
+            #pprint(organizations)
             repos = []
             for org in organizations:
                 command = f"gh repo list {org} -L 1000"
                 r = Shell.run(command)
-                print(r)
+                count = len(r.splitlines())
+                Console.msg(f"List repos for {org}. Found {count}")
                 lines = [x.split()[0] for x in r.splitlines()]
-                print(lines)
                 repos = repos + lines
+
             pprint(repos)
 
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             writefile(filename,"\n".join(repos))
             Console.ok(f'\nWritten list of repos to {filename}')
 
-        elif arguments["newlist"]:
+        #elif arguments["list"]:
 
-            print('hi')
-            '''m = Manager()
+        #    print('hi')
+        #    '''m = Manager()
 
-            m.list(arguments.MATCH)'''
+        #    m.list(arguments.MATCH)'''
 
         elif arguments.clone and arguments["--all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
