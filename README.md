@@ -13,3 +13,21 @@ Documentation
 see cloudmesh.cmd5
 
 * https://github.com/cloudmesh/cloudmesh.cmd5
+
+
+## TODO
+
+* create gh class
+* develop api for most useful things for us
+
+What is most useful
+
+* create repo given name in csv file with
+  * firstname, lastname, githubid, hid (hid we define and is incremental number, hid<number>) 
+  * add README.md
+  * add LICENSE
+  * add a directory copy from a sample repo
+    * latex document
+    * markdown document
+    * cloudmesh dir with small readme how to create a cms command
+  

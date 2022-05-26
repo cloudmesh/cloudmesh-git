@@ -41,6 +41,7 @@ class GitCommand(PluginCommand):
                 git clone all [--force=no]
                 git pull all
                 git issuelist [--format=HTML] [--out=a.html]
+                git issue [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
 
           This command does some useful things.
 
@@ -49,8 +50,17 @@ class GitCommand(PluginCommand):
               ORG    [default: cloudmesh-community]
               MATCH  is a string that must occur in the repo name or description
               --file=FILE   specify the file
-              --repo=REPO   the repository
-
+              --repo=REPO   a parameterized list of repo links. If cloudmesh- is the prefix it will be
+                            automatically replaced by the repo url. REPO is a parameterized list with
+                            comma separaed so that multiple repos can be used.
+                            If REPO is a filename, each line specifies a repo. the cloudmesh prefix
+                            replacement is applied on each line
+                            If repo is . or the parameter is ommitted, all directories in the current
+                            directory are used to list their issues
+             --assignee=ASSIGNEE  a list of assignees so only issues for these users are displayed
+                                  if it is ommitted all issues for assignees are displayed.
+             --refresh  only doesnload the github issue list if --refersh is uses, otherwise it uses a local cache in
+                        ~/.cloudmesh/issuelist.json
 
           Options:
               --force=no    pull the repository if it already exists in current working directory [default: no]
@@ -156,7 +166,6 @@ class GitCommand(PluginCommand):
 
         if arguments.list and arguments.all:
 
-
             command = "gh api  /user/memberships/orgs"
             r = Shell.run(command)
             # print(r)
@@ -222,12 +231,36 @@ class GitCommand(PluginCommand):
             writefile(filename, "\n".join(repos))
             Console.ok(f'\nWritten list of repos to {filename}')
 
+        elif arguments.issue:
+
+            print ("a")
+            if arguments["--refresh"]:
+                print("download issues")
+
+
+            # hisis just a test
+
+            d = "cloudmesh-pi-burn"
+            from cloudmesh.git.gh import Gh
+            from cloudmesh.common.Printer import Printer
+            from cloudmesh.common.util import writefile
+            from cloudmesh.common.Shell import Shell
+            github = Gh()
+            r = github.issues(assignee=None, path=d)
+            table = github.issues_to_table(r)
+
+            html = path_expand("~/.cloudmesh/issuelist.html")
+            writefile(html, table)
+            Shell.browser(html)
+
+
         elif arguments.issuelist:
             html_location = path_expand("~/.cloudmesh/issuelist.html")
             if arguments['--out']:
                 html_location = path_expand(f"~/.cloudmesh/{arguments['--out']}")
             cwd = os.getcwd()
             expanded = path_expand(cwd)#.replace('\\', '/')
+            # this test is not needed it shoudl work on any subdir
             if 'cm' not in os.path.basename(cwd):
                 Console.error('You are not standing in cm directory. This command may not work.')
             else:
@@ -235,22 +268,29 @@ class GitCommand(PluginCommand):
             command = f'gh issue list --json=title,assignees,url'
             issues = []
             for path in glob.glob(f'./**/', recursive=False):
-                path = path[1:]
-                path2 = f'{expanded}{path}'
-                path2 = path2.replace("\\","/")
-                command = f'cd {path2} && gh issue list --assignee "@me" --json=title,assignees,url'
-                banner(command)
                 try:
-                    r = Shell.run(command)
-                except subprocess.CalledProcessError as e:
-                    print(str(e.output))
-                result = json.loads(r)
-                result2 = json.dumps(result, indent=2)
-                pprint(result2)
-                if result2 != '[]':
-                    repo_name = (path.rsplit('/', 1)[-1]).replace("\\", "")
-                    issues.append(f"repository: {repo_name}")
-                    issues.append(result2)
+                    path = path[1:]
+                    path2 = f'{expanded}{path}'
+                    path2 = path2.replace("\\","/")
+                    command = f'cd {path2} && gh issue list --assignee "@me" --json=title,assignees,url'
+                    command = f'cd {path2} && gh issue list --json=title,assignees,url'
+                    banner(command)
+                    try:
+                        r = Shell.run(command)
+                    except subprocess.CalledProcessError as e:
+                        print(str(e.output))
+
+                    print(r)
+
+                    result = json.loads(r)
+                    result2 = json.dumps(result, indent=2)
+                    pprint(result2)
+                    if result2 != '[]':
+                        repo_name = (path.rsplit('/', 1)[-1]).replace("\\", "")
+                        issues.append(f"repository: {repo_name}")
+                        issues.append(result2)
+                except Exception as e:
+                    Console.error(e)
             pprint(issues)
 
             html_template = """<html>
@@ -262,7 +302,7 @@ class GitCommand(PluginCommand):
 
             <p>
 
-            
+            <table>
             """
 
             for string in issues:
