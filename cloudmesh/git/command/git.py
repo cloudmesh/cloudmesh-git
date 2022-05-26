@@ -236,7 +236,7 @@ class GitCommand(PluginCommand):
             if arguments["--refresh"]:
                 print("download issues")
                 if not os.path.exists((path_expand("~/.cloudmesh/issuelist.html"))):
-                    Console.error("Cannot refresh because the issue command has not been successfully run yet.")
+                    Console.error("Cannot refresh because the issues command has not been successfully run yet.")
                     return ""
 
             # hisis just a test

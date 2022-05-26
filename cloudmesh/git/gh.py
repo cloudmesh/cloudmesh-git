@@ -53,7 +53,7 @@ class Gh:
                 entry['url'] = f'<a href="{url}"> {n} </a>'
                 entry['title'] = f'<a href="{url}"> {title} </a>'
                 entry['assignees'] = ",".join(
-                    [f'<a href="github.com/{assignee["login"]}"> {assignee["name"] or assignee["login"]} </a>'
+                    [f'<a href="https://github.com/{assignee["login"]}"> {assignee["name"] or assignee["login"]} </a>'
                      for assignee in assignees])
                 if len(labels) > 0:
                     entry['labels'] = ",".join([label['name'].replace("PRIORITY ", "") for label in labels])
