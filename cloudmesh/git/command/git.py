@@ -41,7 +41,7 @@ class GitCommand(PluginCommand):
                 git clone all [--force=no]
                 git pull all
                 git issuelist [--format=HTML] [--out=a.html]
-                git issue [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
+                git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
 
           This command does some useful things.
 
@@ -231,7 +231,7 @@ class GitCommand(PluginCommand):
             writefile(filename, "\n".join(repos))
             Console.ok(f'\nWritten list of repos to {filename}')
 
-        elif arguments.issue:
+        elif arguments.issues:
 
             print ("a")
             if arguments["--refresh"]:
@@ -240,17 +240,23 @@ class GitCommand(PluginCommand):
 
             # hisis just a test
 
-            d = "cloudmesh-pi-burn"
+            repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster"]
+
             from cloudmesh.git.gh import Gh
             from cloudmesh.common.Printer import Printer
             from cloudmesh.common.util import writefile
             from cloudmesh.common.Shell import Shell
             github = Gh()
-            r = github.issues(assignee=None, path=d)
-            table = github.issues_to_table(r)
+
+            tables = ""
+            for d in repos:
+                print(d)
+                r = github.issues(name=d, assignee=None, path=d)
+                table = github.issues_to_table(r, name=d)
+                tables = tables + table + "\n"
 
             html = path_expand("~/.cloudmesh/issuelist.html")
-            writefile(html, table)
+            writefile(html, tables)
             Shell.browser(html)
 
 

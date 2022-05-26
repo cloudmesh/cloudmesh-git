@@ -16,7 +16,7 @@ class Gh:
         except Exception as e:
             print(str(e.output))
 
-    def issues(self, assignee="@me", path="."):
+    def issues(self, assignee="@me", path=".", name=None):
         r = None
         directory = path_expand(path)
         if assignee is None:
@@ -28,13 +28,15 @@ class Gh:
             r = Shell.run(command)
             r = json.loads(r)
         except Exception as e:
-            print(str(e.output))
+            print(e)
         return r
 
+    def issues_to_table(self, entries, name=None):
 
-    def issues_to_table(self, entries):
-        result = ['<table frame="border" rules="all">']
-        line = f'<tr><th> url </th><th> title </th><th> assignees</th></tr>'
+        result = [
+            f'<br><b>{name}</b><br><br>',
+            '<table frame="border" rules="all" border-spacing="30px";>']
+        line = f'<tr><th> repo </th><th> url </th><th> title </th><th> assignees</th></tr>'
         result.append(line)
 
         for entry in entries:
