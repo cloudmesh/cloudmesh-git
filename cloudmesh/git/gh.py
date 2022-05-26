@@ -23,7 +23,7 @@ class Gh:
             parameter = ""
         else:
             parameter = f'--assignee "{assignee}"'
-        command = f'cd {directory} && gh issue list {parameter} --json=title,assignees,url'
+        command = f'cd {directory} && gh issue list {parameter} --json=title,assignees,url,labels'
         try:
             r = Shell.run(command)
             r = json.loads(r)
@@ -43,6 +43,7 @@ class Gh:
             url = entry['url']
             title = entry['title']
             assignees = entry['assignees']
+            labels = entry['labels']
             n = os.path.basename(url)
             repo = os.path.dirname(url)
             repo_url = os.path.dirname(repo)
@@ -50,9 +51,20 @@ class Gh:
             entry['repo'] = f'<a href="{repo_url}"> {repo_name} </a>'
             entry['url'] = f'<a href="{url}"> {n} </a>'
             entry['title'] = f'<a href="{url}"> {title} </a>'
-            entry['assignees'] = ",".join([f'<a href="github.com/{assignee["login"]}"> {assignee["name"] or assignee["login"]} </a>'
-                                           for assignee in assignees])
-            line = f'<tr><td> {entry["repo"]} </td> <td> {entry["url"]} </td><td> {entry["title"]} </td><td> {entry["assignees"]}</td></tr>'
+            entry['assignees'] = ",".join(
+                [f'<a href="github.com/{assignee["login"]}"> {assignee["name"] or assignee["login"]} </a>'
+                 for assignee in assignees])
+            if len(labels) > 0:
+                entry['labels'] = ",".join([label['name'].replace("PRIORITY ", "") for label in labels])
+            else:
+                entry['labels'] = ""
+            line = f'<tr>'\
+                   f'<td> {entry["repo"]} </td>'\
+                   f'<td> {entry["url"]} </td>'\
+                   f'<td> {entry["title"]} </td>'\
+                   f'<td> {entry["assignees"]}</td>'\
+                   f'<td>{entry["labels"]}<td>'\
+                   '</tr>'
             result.append(line)
         result.append("</table>")
         result = "\n".join(result)
