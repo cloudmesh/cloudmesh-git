@@ -6,11 +6,15 @@ from cloudmesh.common.util import path_expand
 from cloudmesh.common.util import banner
 from cloudmesh.common.util import str_bool
 from cloudmesh.common.console import Console
+from cloudmesh.common.systeminfo import os_is_windows
+from cloudmesh.common.systeminfo import os_is_mac
+from cloudmesh.common.systeminfo import os_is_linux
 from cloudmesh.git.api.manager import Manager
 from cloudmesh.git.copy import copy_dir
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.shell.command import command, map_parameters
 from cloudmesh.common.Shell import Shell
+import re
 import os
 import json
 import glob
@@ -36,6 +40,7 @@ class GitCommand(PluginCommand):
                 git --refresh
                 git clone all [--force=no]
                 git pull all
+                git issuelist [--format=HTML] [--out=a.html]
 
           This command does some useful things.
 
@@ -103,6 +108,11 @@ class GitCommand(PluginCommand):
                 git pull all
                     git pulls all directories and subdirectories of
                     current working directory
+
+                git issuelist
+                    creates html file of all issues assigned to logged-in
+                    user. assumes that the user is standing in cm
+                    directory
 
           Examples:
 
@@ -211,6 +221,96 @@ class GitCommand(PluginCommand):
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             writefile(filename, "\n".join(repos))
             Console.ok(f'\nWritten list of repos to {filename}')
+
+        elif arguments.issuelist:
+            html_location = path_expand("~/.cloudmesh/issuelist.html")
+            if arguments['--out']:
+                html_location = path_expand(f"~/.cloudmesh/{arguments['--out']}")
+            cwd = os.getcwd()
+            expanded = path_expand(cwd)#.replace('\\', '/')
+            if 'cm' not in os.path.basename(cwd):
+                Console.error('You are not standing in cm directory. This command may not work.')
+            else:
+                Console.ok('You are standing in cm directory. Proceeding...')
+            command = f'gh issue list --json=title,assignees,url'
+            issues = []
+            for path in glob.glob(f'./**/', recursive=False):
+                path = path[1:]
+                path2 = f'{expanded}{path}'
+                path2 = path2.replace("\\","/")
+                command = f'cd {path2} && gh issue list --assignee "@me" --json=title,assignees,url'
+                banner(command)
+                try:
+                    r = Shell.run(command)
+                except subprocess.CalledProcessError as e:
+                    print(str(e.output))
+                result = json.loads(r)
+                result2 = json.dumps(result, indent=2)
+                pprint(result2)
+                if result2 != '[]':
+                    repo_name = (path.rsplit('/', 1)[-1]).replace("\\", "")
+                    issues.append(f"repository: {repo_name}")
+                    issues.append(result2)
+            pprint(issues)
+
+            html_template = """<html>
+            <head>
+            <title>Issues</title>
+            </head>
+            <body>
+            <h2>Generated Issue List</h2>
+
+            <p>
+
+            
+            """
+
+            for string in issues:
+                split_lines = string.splitlines()
+                for line in split_lines:
+                    if "repository:" in line:
+                        html_template += f"""
+                        <font size="+3">{line}</font><br>
+                        """
+                    if '"title":' in line:
+                        title_re = re.findall('"([^"]*)"', line)
+                        html_template += f"""
+                        {title_re[1]}<br>
+                        """
+                    if '"url":' in line:
+                        regex_list = re.findall('"([^"]*)"', line)
+                        html_template += f"""
+                        <a href="{regex_list[1]}">{regex_list[1]}</a><br>
+                        """
+
+            html_template += """
+            </p>
+            </body>
+            </html>
+            """
+            writefile(html_location, html_template)
+            Console.ok(f"Written to {html_location}")
+            if os_is_windows:
+                try:
+                    command = f"start firefox {html_location}"
+                    Shell.run(command)
+                except subprocess.CalledProcessError as e:
+                    command = f"start chrome {html_location}"
+                    Shell.run(command)
+            if os_is_mac:
+                try:
+                    command = f"open {html_location}"
+                    Shell.run(command)
+                except subprocess.CalledProcessError as e:
+                    Console.error("Failed to open html file.\n")
+                    print(str(e.output))
+            if os_is_linux:
+                try:
+                    command = f"xdg-open {html_location}"
+                    Shell.run(command)
+                except subprocess.CalledProcessError as e:
+                    Console.error("Failed to open html file.\n")
+                    print(str(e.output))
 
         elif arguments.clone and arguments["all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
