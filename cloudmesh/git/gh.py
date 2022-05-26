@@ -50,7 +50,7 @@ class Gh:
             entry['repo'] = f'<a href="{repo_url}"> {repo_name} </a>'
             entry['url'] = f'<a href="{url}"> {n} </a>'
             entry['title'] = f'<a href="{url}"> {title} </a>'
-            entry['assignees'] = ",".join([f'<a href="github.com/{assignee["login"]}"> {assignee["name"]} </a>'
+            entry['assignees'] = ",".join([f'<a href="github.com/{assignee["login"]}"> {assignee["name"] or assignee["login"]} </a>'
                                            for assignee in assignees])
             line = f'<tr><td> {entry["repo"]} </td> <td> {entry["url"]} </td><td> {entry["title"]} </td><td> {entry["assignees"]}</td></tr>'
             result.append(line)
