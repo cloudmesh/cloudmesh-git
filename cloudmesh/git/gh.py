@@ -36,7 +36,7 @@ class Gh:
         result = [
             f'<br><b>{name}</b><br><br>',
             '<table frame="border" rules="all" border-spacing="30px";>']
-        line = f'<tr><th> repo </th><th> url </th><th> title </th><th> assignees</th></tr>'
+        line = f'<tr><th> repo </th><th> url </th><th> title </th><th> assignees</th><th> labels</th></tr>'
         result.append(line)
 
         for entry in entries:
