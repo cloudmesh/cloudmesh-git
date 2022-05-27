@@ -116,8 +116,8 @@ class Gh:
                 line = f'<tr>'\
                        f'<td> {entry["repo"]} </td>'\
                        f'<td> {entry["url"]} </td>'\
-                       f'<td> {entry["title"]} </td>'\
-                       f'<td> {entry["assignees"]}</td>'\
+                       f'<td> {entry["assignees"]}</td>' \
+                       f'<td> {entry["title"]} </td>' \
                        f'<td>{entry["labels"]}<td>'\
                        '</tr>'
                 result.append(line)
