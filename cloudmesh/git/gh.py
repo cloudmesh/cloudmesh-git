@@ -42,10 +42,18 @@ class Gh:
         except Exception as e:
             print(e)
 
-    def issues_from_repos(self, assignee=None, path=["."], name=None):
+    def issues_find(self, assignee, path=["."]):
         _issues = []
         for p in path:
-            r = self.issues(assignee=assignee, path=p, name=name)
+            for a in assignee:
+                r = self.issues_from_repos(assignee=a, path=[p])
+                _issues.append(r)
+        return _issues
+
+    def issues_from_repos(self, assignee=None, path=["."]):
+        _issues = []
+        for p in path:
+            r = self.issues(assignee=assignee, path=p)
             _issues.append(r)
         self.issue_list = _issues
         return _issues

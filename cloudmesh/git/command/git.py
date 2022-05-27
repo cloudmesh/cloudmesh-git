@@ -154,7 +154,8 @@ class GitCommand(PluginCommand):
                        'move',
                        'repo',
                        'file',
-                       'title'
+                       'title',
+                       'assignee'
                        )
         move = arguments.move or "move"
 
@@ -236,6 +237,10 @@ class GitCommand(PluginCommand):
 
             github = Gh()
 
+            # currently only allowing one user
+            
+            assignee = Parameter.expand(arguments.assignee)[0]
+            # TODO: assignee = Parameter.expand(arguments.assignee)
             if arguments.repo in ['.', "cwd", None]:
                 repos = github.repos_in_dir()
             elif arguments.repo in ["pi"]:
@@ -244,7 +249,8 @@ class GitCommand(PluginCommand):
             refresh = arguments["--refresh"] or not github.cache_esists()
             if refresh:
                 github.cache_delete()
-                github.issues_from_repos(path=repos)
+                github.issues_from_repos(path=repos, assignee=assignee)
+                # TODO: github.issues_find(path=repos, assignee=assignee)
                 github.cache_save()
             else:
                 github.cache_load()
