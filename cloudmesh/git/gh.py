@@ -1,6 +1,7 @@
 from cloudmesh.common.Shell import Shell
 from cloudmesh.common.util import path_expand
 from cloudmesh.common.util import readfile
+from cloudmesh.common.util import writefile
 from cloudmesh.common.console import Console
 import json
 import os
@@ -9,16 +10,23 @@ class Gh:
 
     def __init__(self):
         self.cache = path_expand("~/.cloudmesh/issuelist.html")
+        self.issue_list = None
 
     def cache_delete(self):
-        if self.cache_esiste():
-            Shell.rm(self.cache)
+        if self.cache_esists():
+            os.remove(self.cache)
 
-    def cache_esiste(self):
+    def cache_esists(self):
         return os.path.isfile(self.cache)
 
     def cache_load(self):
         content = readfile(self.cache)
+        # do something with the content and load it into _issue_list
+        self.issue_list = eval(content)
+
+    def cache_save(self):
+        # safe json as string  with json.dumps
+        content = writefile(str(self.issue_list))
 
     def repos_in_dir(self, directory="."):
         _directory = path_expand(directory)
@@ -32,6 +40,15 @@ class Gh:
             r = Shell.run(command)
         except Exception as e:
             print(e)
+
+    def issues_from_repos(self, assignee="@me", path=["."], name=None):
+        _issues = []
+        for p in path:
+            print ("PPP", p)
+            r = self.issues(assignee=assignee, path=p, name=name)
+        _issues.append(r)
+        self.issue_list = _issues
+        return _issues
 
     def issues(self, assignee="@me", path=".", name=None):
         r = None
