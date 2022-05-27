@@ -238,9 +238,10 @@ class GitCommand(PluginCommand):
             github = Gh()
 
             # currently only allowing one user
-            
-            assignee = Parameter.expand(arguments.assignee)[0]
+            #if arguments.assignee is not None:
+            #    assignee = Parameter.expand(arguments.assignee)[0]
             # TODO: assignee = Parameter.expand(arguments.assignee)
+            assignee = arguments.assignee
             if arguments.repo in ['.', "cwd", None]:
                 repos = github.repos_in_dir()
             elif arguments.repo in ["pi"]:
