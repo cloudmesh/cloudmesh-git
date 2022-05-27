@@ -236,25 +236,29 @@ class GitCommand(PluginCommand):
 
             github = Gh()
 
-
             #refresh = arguments["--refresh"] or not github.cache_esists()
             #if refresh:
             #    github.delete_cache()
 
-            repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
-
-            repos = github.repos_in_dir()
+            if arguments.repo in ['.', "cwd", None]:
+                repos = github.repos_in_dir()
+            elif arguments.repo in ["pi"]:
+                repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
 
             tables = ""
+            total = 0
             for d in repos:
-                print(d)
+                print(d, end=" ")
                 r = github.issues(name=d, assignee=None, path=d)
+                print (len(r))
+                total = total + len(r)
                 table = github.issues_to_table(r, name=d)
                 if not table:
                     continue
                 tables = tables + table + "\n"
-
+            tables = f"Total Issues: {total}<br>" + tables
             html = path_expand("~/.cloudmesh/issuelist.html")
+            print("Total Issues", total)
             writefile(html, tables)
             Shell.browser(html)
 
