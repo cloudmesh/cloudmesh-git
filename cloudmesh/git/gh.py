@@ -114,11 +114,11 @@ class Gh:
                 else:
                     entry['labels'] = ""
                 line = f'<tr>'\
-                       f'<td style="padding:10px"> {entry["repo"]} </td>'\
-                       f'<td style="padding:10px"> {entry["url"]} </td>'\
-                       f'<td style="padding:10px"> {entry["assignees"]}</td>' \
-                       f'<td style="padding:10px"> {entry["title"]} </td>' \
-                       f'<td style="padding:10px">{entry["labels"]}<td>'\
+                       f'<td style="padding:5px"> {entry["repo"]} </td>'\
+                       f'<td style="padding:5px"> {entry["url"]} </td>'\
+                       f'<td style="padding:5px"> {entry["assignees"]}</td>' \
+                       f'<td style="padding:5px"> {entry["title"]} </td>' \
+                       f'<td style="padding:5px">{entry["labels"]}<td>'\
                        '</tr>'
                 result.append(line)
             result.append("</table>")
