@@ -1,12 +1,27 @@
 from cloudmesh.common.Shell import Shell
 from cloudmesh.common.util import path_expand
+from cloudmesh.common.util import readfile
 import json
 import os
 
 class Gh:
 
     def __int__(self):
-        pass
+        self.cache = path_expand("~/.cloudmesh/issuelist.html")
+
+    def cache_delete(self):
+        if self.cache_esiste():
+            Shell.rm(self.cache)
+
+    def cache_esiste(self):
+        return os.path.isfile(self.cache)
+
+    def cache_load(self):
+        content = readfile(self.cache)
+
+    def repos_in_dir(directory="."):
+        repos = [name for name in os.listdir(directory) if os.path.isdir(name) and os.path.isdir(f"{name}/.git")]
+        return repos
 
     def run(self, command, path="."):
         directory = path_expand(path)
