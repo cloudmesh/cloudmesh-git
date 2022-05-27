@@ -1,25 +1,28 @@
-from cloudmesh.common.debug import VERBOSE
-from cloudmesh.common.parameter import Parameter
-from cloudmesh.common.util import writefile
-from cloudmesh.common.util import readfile
-from cloudmesh.common.util import path_expand
-from cloudmesh.common.util import banner
-from cloudmesh.common.util import str_bool
-from cloudmesh.common.console import Console
-from cloudmesh.common.systeminfo import os_is_windows
-from cloudmesh.common.systeminfo import os_is_mac
-from cloudmesh.common.systeminfo import os_is_linux
-from cloudmesh.git.api.manager import Manager
-from cloudmesh.git.copy import copy_dir
-from cloudmesh.shell.command import PluginCommand
-from cloudmesh.shell.command import command, map_parameters
-from cloudmesh.common.Shell import Shell
-import re
-import os
-import json
 import glob
+import json
+import os
+import re
 import subprocess
 from pprint import pprint
+
+from cloudmesh.common.Shell import Shell
+from cloudmesh.common.console import Console
+from cloudmesh.common.debug import VERBOSE
+from cloudmesh.common.parameter import Parameter
+from cloudmesh.common.systeminfo import os_is_linux
+from cloudmesh.common.systeminfo import os_is_mac
+from cloudmesh.common.systeminfo import os_is_windows
+from cloudmesh.common.util import banner
+from cloudmesh.common.util import path_expand
+from cloudmesh.common.util import readfile
+from cloudmesh.common.util import str_bool
+from cloudmesh.common.util import writefile
+from cloudmesh.git.api.manager import Manager
+from cloudmesh.git.copy import copy_dir
+from cloudmesh.git.gh import Gh
+from cloudmesh.shell.command import PluginCommand
+from cloudmesh.shell.command import command, map_parameters
+
 
 class GitCommand(PluginCommand):
 
@@ -249,10 +252,6 @@ class GitCommand(PluginCommand):
             else:
                 repos = Parameter.expand(arguments["--repo"])
 
-            from cloudmesh.git.gh import Gh
-            from cloudmesh.common.Printer import Printer
-            from cloudmesh.common.util import writefile
-            from cloudmesh.common.Shell import Shell
             github = Gh()
 
             tables = ""
