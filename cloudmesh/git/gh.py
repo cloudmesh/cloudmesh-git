@@ -9,7 +9,7 @@ import os
 class Gh:
 
     def __init__(self):
-        self.cache = path_expand("~/.cloudmesh/issuelist.html")
+        self.cache = path_expand("~/.cloudmesh/issuelist.json")
         self.issue_list = None
 
     def cache_delete(self):
@@ -26,7 +26,8 @@ class Gh:
 
     def cache_save(self):
         # safe json as string  with json.dumps
-        content = writefile(str(self.issue_list))
+        content = json.dumps(self.issue_list, indent=2)
+        writefile(filename=self.cache, content=content)
 
     def repos_in_dir(self, directory="."):
         _directory = path_expand(directory)
@@ -41,16 +42,15 @@ class Gh:
         except Exception as e:
             print(e)
 
-    def issues_from_repos(self, assignee="@me", path=["."], name=None):
+    def issues_from_repos(self, assignee=None, path=["."], name=None):
         _issues = []
         for p in path:
-            print ("PPP", p)
             r = self.issues(assignee=assignee, path=p, name=name)
-        _issues.append(r)
+            _issues.append(r)
         self.issue_list = _issues
         return _issues
 
-    def issues(self, assignee="@me", path=".", name=None):
+    def issues(self, assignee=None, path="."):
         r = None
         directory = path_expand(path)
         if assignee is None:
@@ -58,6 +58,8 @@ class Gh:
         else:
             parameter = f'--assignee "{assignee}"'
         command = f'cd {directory} && gh issue list {parameter} --json=title,assignees,url,labels'
+        print (command)
+
         try:
             r = Shell.run(command)
             r = json.loads(r)
@@ -65,13 +67,23 @@ class Gh:
             print(e)
         return r
 
-    def issues_to_table(self, entries, name=None):
+    def issues_to_table(self, entries):
+
+        try:
+            entry = entries[0]
+            repo = os.path.dirname(entry['url'])
+            repo_url = os.path.dirname(repo)
+            repo_name = repo_url.replace("https://github.com/", "")
+            name = repo_name
+        except:
+            name = "???"
 
         result = [
             f'<br><b>{name}</b><br><br>',
             '<table frame="border" rules="all" border-spacing="30px";>']
         line = f'<tr><th> repo </th><th> url </th><th> title </th><th> assignees</th><th> labels</th></tr>'
         result.append(line)
+
 
         if entries:
             for entry in entries:
@@ -82,7 +94,7 @@ class Gh:
                 n = os.path.basename(url)
                 repo = os.path.dirname(url)
                 repo_url = os.path.dirname(repo)
-                repo_name = repo_url.replace("https://github.com", "")
+                repo_name = repo_url.replace("https://github.com/", "")
                 entry['repo'] = f'<a href="{repo_url}"> {repo_name} </a>'
                 entry['url'] = f'<a href="{url}"> {n} </a>'
                 entry['title'] = f'<a href="{url}"> {title} </a>'
