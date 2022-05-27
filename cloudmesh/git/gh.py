@@ -20,12 +20,8 @@ class Gh:
     def cache_load(self):
         content = readfile(self.cache)
 
-    def repos_in_dir(directory="."):
-        print ("B")
+    def repos_in_dir(self, directory="."):
         _directory = path_expand(directory)
-        _directory = "lll"
-
-        print(">>>>>",_directory)
         repos = [name for name in os.listdir(_directory) if os.path.isdir(name) and os.path.isdir(f"{name}/.git")]
         return repos
 

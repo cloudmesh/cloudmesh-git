@@ -243,9 +243,7 @@ class GitCommand(PluginCommand):
 
             repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
 
-            print ("A")
             repos = github.repos_in_dir()
-            print ("A")
 
             tables = ""
             for d in repos:
