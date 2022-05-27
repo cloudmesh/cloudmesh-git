@@ -233,14 +233,13 @@ class GitCommand(PluginCommand):
 
         elif arguments.issues:
 
-            print ("a")
             if arguments["--refresh"]:
                 print("download issues")
 
 
             # hisis just a test
 
-            repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster"]
+            repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
 
             from cloudmesh.git.gh import Gh
             from cloudmesh.common.Printer import Printer

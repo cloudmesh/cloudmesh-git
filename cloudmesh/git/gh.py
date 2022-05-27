@@ -14,7 +14,7 @@ class Gh:
         try:
             r = Shell.run(command)
         except Exception as e:
-            print(str(e.output))
+            print(e)
 
     def issues(self, assignee="@me", path=".", name=None):
         r = None
