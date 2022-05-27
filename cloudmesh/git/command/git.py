@@ -55,14 +55,14 @@ class GitCommand(PluginCommand):
               --file=FILE   specify the file
               --repo=REPO   a parameterized list of repo links. If cloudmesh- is the prefix it will be
                             automatically replaced by the repo url. REPO is a parameterized list with
-                            comma separaed so that multiple repos can be used.
+                            comma separated so that multiple repos can be used.
                             If REPO is a filename, each line specifies a repo. the cloudmesh prefix
                             replacement is applied on each line
                             If repo is . or the parameter is ommitted, all directories in the current
                             directory are used to list their issues
              --assignee=ASSIGNEE  a list of assignees so only issues for these users are displayed
                                   if it is ommitted all issues for assignees are displayed.
-             --refresh  only doesnload the github issue list if --refersh is uses, otherwise it uses a local cache in
+             --refresh  only downnload the GitHub issue list if --refersh is uses, otherwise it uses a local cache in
                         ~/.cloudmesh/issuelist.json
 
           Options:
@@ -74,7 +74,7 @@ class GitCommand(PluginCommand):
                 cloudmesh-community
 
                 git --refresh
-                    inds all organizations and repositories the current user belongs to
+                    finds all organizations and repositories the current user belongs to
                     redirects automatically to ~/cloudmesh/git/repo-list.txt
 
                 git clone all [--force=no]
@@ -161,7 +161,6 @@ class GitCommand(PluginCommand):
 
         VERBOSE(arguments)
 
-
         # if arguments.FILE:
         #    print("option a")
         #    m.list(path_expand(arguments.FILE))
@@ -175,8 +174,8 @@ class GitCommand(PluginCommand):
 
             result = json.loads(r)
 
-            result2 = json.dumps(result,indent=2)
-            #pprint(result2)
+            result2 = json.dumps(result, indent=2)
+            # pprint(result2)
             exclude = Parameter.expand(arguments["--exclude"]) or []
             organizations = []
 
@@ -186,7 +185,7 @@ class GitCommand(PluginCommand):
                 if name not in exclude:
                     organizations.append(name)
 
-            #pprint(organizations)
+            # pprint(organizations)
             repos = []
             for org in organizations:
                 command = f"gh repo list {org} -L 1000"
@@ -199,10 +198,10 @@ class GitCommand(PluginCommand):
             pprint(repos)
 
             filename = path_expand("~/.cloudmesh/git_cache.txt")
-            writefile(filename,"\n".join(repos))
+            writefile(filename, "\n".join(repos))
             Console.ok(f'\nWritten list of repos to {filename}')
 
-        #elif arguments["list"]:
+        # elif arguments["list"]:
 
         #    '''m = Manager()
 
@@ -267,14 +266,13 @@ class GitCommand(PluginCommand):
             writefile(html, tables)
             Shell.browser(html)
 
-
         elif arguments.issuelist:
             html_location = path_expand("~/.cloudmesh/issuelist.html")
             if arguments['--out']:
                 html_location = path_expand(f"~/.cloudmesh/{arguments['--out']}")
             cwd = os.getcwd()
-            expanded = path_expand(cwd)#.replace('\\', '/')
-            # this test is not needed it shoudl work on any subdir
+            expanded = path_expand(cwd)  # .replace('\\', '/')
+            # this test is not needed it should work on any subdir
             if 'cm' not in os.path.basename(cwd):
                 Console.error('You are not standing in cm directory. This command may not work.')
             else:
@@ -285,7 +283,7 @@ class GitCommand(PluginCommand):
                 try:
                     path = path[1:]
                     path2 = f'{expanded}{path}'
-                    path2 = path2.replace("\\","/")
+                    path2 = path2.replace("\\", "/")
                     command = f'cd {path2} && gh issue list --assignee "@me" --json=title,assignees,url'
                     command = f'cd {path2} && gh issue list --json=title,assignees,url'
                     banner(command)
@@ -427,7 +425,6 @@ class GitCommand(PluginCommand):
             dirs = arguments["DIRS"] or "."
             org = "get the org from the current dir in .git"
             repo = "get the repo from the current dir in .git"
-
 
             for d in dirs:
                 if d == ".":
