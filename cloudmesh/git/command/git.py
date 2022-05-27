@@ -235,11 +235,19 @@ class GitCommand(PluginCommand):
 
             if arguments["--refresh"]:
                 print("download issues")
-
+                if not os.path.exists((path_expand("~/.cloudmesh/issuelist.html"))):
+                    Console.error("Cannot refresh because the issues command has not been successfully run yet.")
+                    return ""
 
             # hisis just a test
 
             repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
+
+            if os.path.exists((path_expand(arguments["--repo"]))):
+                repos = list(map(os.path.basename, readfile(path_expand(arguments["--repo"])).splitlines()))
+
+            else:
+                repos = Parameter.expand(arguments["--repo"])
 
             from cloudmesh.git.gh import Gh
             from cloudmesh.common.Printer import Printer
@@ -252,6 +260,8 @@ class GitCommand(PluginCommand):
                 print(d)
                 r = github.issues(name=d, assignee=None, path=d)
                 table = github.issues_to_table(r, name=d)
+                if not table:
+                    continue
                 tables = tables + table + "\n"
 
             html = path_expand("~/.cloudmesh/issuelist.html")
