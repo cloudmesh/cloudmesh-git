@@ -1,12 +1,13 @@
 from cloudmesh.common.Shell import Shell
 from cloudmesh.common.util import path_expand
 from cloudmesh.common.util import readfile
+from cloudmesh.common.console import Console
 import json
 import os
 
 class Gh:
 
-    def __int__(self):
+    def __init__(self):
         self.cache = path_expand("~/.cloudmesh/issuelist.html")
 
     def cache_delete(self):
@@ -20,7 +21,12 @@ class Gh:
         content = readfile(self.cache)
 
     def repos_in_dir(directory="."):
-        repos = [name for name in os.listdir(directory) if os.path.isdir(name) and os.path.isdir(f"{name}/.git")]
+        print ("B")
+        _directory = path_expand(directory)
+        _directory = "lll"
+
+        print(">>>>>",_directory)
+        repos = [name for name in os.listdir(_directory) if os.path.isdir(name) and os.path.isdir(f"{name}/.git")]
         return repos
 
     def run(self, command, path="."):

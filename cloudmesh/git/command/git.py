@@ -236,13 +236,16 @@ class GitCommand(PluginCommand):
 
             github = Gh()
 
+
             #refresh = arguments["--refresh"] or not github.cache_esists()
             #if refresh:
             #    github.delete_cache()
 
             repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
 
-            repos = github.repos_in_dir(".")
+            print ("A")
+            repos = github.repos_in_dir()
+            print ("A")
 
             tables = ""
             for d in repos:
