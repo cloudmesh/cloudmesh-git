@@ -35,6 +35,8 @@ class GitCommand(PluginCommand):
         ::
 
           Usage:
+                git contribution
+                git committers
                 git create issue --repo=REPO --file=FILE [--title=TITLE] [--org=ORG]
                 git create repository FIRSTNAME LASTNAME GITHUBID [--org=ORG]
                 git create repository --file=FILE [--org=ORG]
@@ -46,7 +48,6 @@ class GitCommand(PluginCommand):
                 git clone all [--force=no]
                 git pull all
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
-                git contribution
 
           This command does some useful things.
 
@@ -169,7 +170,13 @@ class GitCommand(PluginCommand):
         #    m.list(path_expand(arguments.FILE))
         #
 
-        if arguments.contribution:
+        if arguments.committers:
+            r = Git.comitters()
+            #print(Printer.write(r))
+            print (r)
+            return ""
+
+        elif arguments.contribution:
             r = Git.contributions_by_line()
             print(Printer.write(r))
             return ""

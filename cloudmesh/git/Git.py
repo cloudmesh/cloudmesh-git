@@ -69,3 +69,8 @@ class Git:
                 'count': count
             }
         return result
+
+    @staticmethod
+    def comitters():
+        r =  Shell.run("git log --all --format='%an <%ae>' -- `git grep -l \"search string\"` | sort -u").strip()
+        return r
