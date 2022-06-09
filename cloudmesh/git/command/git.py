@@ -20,8 +20,10 @@ from cloudmesh.common.util import writefile
 from cloudmesh.git.api.manager import Manager
 from cloudmesh.git.copy import copy_dir
 from cloudmesh.git.gh import Gh
+from cloudmesh.git.Git import Git
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.shell.command import command, map_parameters
+from cloudmesh.common.Printer import Printer
 
 
 class GitCommand(PluginCommand):
@@ -44,6 +46,7 @@ class GitCommand(PluginCommand):
                 git clone all [--force=no]
                 git pull all
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
+                git contribution
 
           This command does some useful things.
 
@@ -159,14 +162,19 @@ class GitCommand(PluginCommand):
                        )
         move = arguments.move or "move"
 
-        VERBOSE(arguments)
+        # VERBOSE(arguments)
 
         # if arguments.FILE:
         #    print("option a")
         #    m.list(path_expand(arguments.FILE))
         #
 
-        if arguments.list and arguments.all:
+        if arguments.contribution:
+            r = Git.contributions_by_line()
+            print(Printer.write(r))
+            return ""
+
+        elif arguments.list and arguments.all:
 
             command = "gh api  /user/memberships/orgs"
             r = Shell.run(command)
