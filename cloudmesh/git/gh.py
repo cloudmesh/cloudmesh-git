@@ -13,10 +13,10 @@ class Gh:
         self.issue_list = None
 
     def cache_delete(self):
-        if self.cache_esists():
+        if self.cache_exists():
             os.remove(self.cache)
 
-    def cache_esists(self):
+    def cache_exists(self):
         return os.path.isfile(self.cache)
 
     def cache_load(self):

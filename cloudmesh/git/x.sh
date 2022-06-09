@@ -2,7 +2,7 @@
 
 # This script, executed at the root of a git repository, deletes traces of every old file in this repository, index + blob on all branches
 # It can take 10-30 minutes to run and will print regular warning stating than some references are unchanged
-# time ./clear_git_repositor.bash >cleaning.log 
+# time ./clear_git_repositor.bash > cleaning.log
 
 # We need several passes to clean files renamed multiple times (git log --find-renames prevents its deletion for each renaming)
 # MAXIMUM_PASSES should be more than the maximum number of renamings/movings for any file, if not then we might keep some traces of former files

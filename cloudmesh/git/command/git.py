@@ -60,11 +60,11 @@ class GitCommand(PluginCommand):
                             comma separated so that multiple repos can be used.
                             If REPO is a filename, each line specifies a repo. the cloudmesh prefix
                             replacement is applied on each line
-                            If repo is . or the parameter is ommitted, all directories in the current
+                            If repo is . or the parameter is omitted, all directories in the current
                             directory are used to list their issues
              --assignee=ASSIGNEE  a list of assignees so only issues for these users are displayed
                                   if it is ommitted all issues for assignees are displayed.
-             --refresh  only downnload the GitHub issue list if --refersh is uses, otherwise it uses a local cache in
+             --refresh  only download the GitHub issue list if --refresh is uses, otherwise it uses a local cache in
                         ~/.cloudmesh/issuelist.json
 
           Options:
@@ -94,9 +94,9 @@ class GitCommand(PluginCommand):
                     lists the repos of the organization
 
                 git list all [--exclude=ORG]
-                    gets info of all repos of the current logged in user to github
-                    put the result in ~/.cloudmesh/gitcache.txt
-                    to exclude an organization, add it to the end of exclude
+                    gets info of all repos of the current in user. It puts
+                    the result in ~/.cloudmesh/gitcache.txt.
+                    To exclude an organization, add it to the end of exclude
                     parameter
 
                 git create issue --repo=REPO FILE
@@ -254,8 +254,22 @@ class GitCommand(PluginCommand):
                 repos = github.repos_in_dir()
             elif arguments.repo in ["pi"]:
                 repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
+            elif arguments.repo in ["reu"]:
+                repos = ["reu2022",
+                         "cloudmesh-slurm",
+                         "cloudmesh-mpi",
+                         "cloudmesh-pi-burn",
+                         "cloudmesh-pi-cluster",
+                         "cloudmesh-git",
+                         "cloudmesh-catalog",
+                         "cloudmesh-common",
+                         "cloudmesh-data",
+                         "cloudmesh-sbatch",
+                         "book",
+                         "bookmanager",
+                         "yamldb"]
 
-            refresh = arguments["--refresh"] or not github.cache_esists()
+            refresh = arguments["--refresh"] or not github.cache_exists()
             if refresh:
                 github.cache_delete()
                 github.issues_from_repos(path=repos, assignee=assignee)
