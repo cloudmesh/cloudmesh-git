@@ -31,7 +31,7 @@ What is most useful
     * markdown document
     * cloudmesh dir with small readme how to create a cms command
   
-## Acknowledgements
+## Acknowledgments
 
 Continued work was in part funded by the NSF
 CyberTraining: CIC: CyberTraining for Students and Technologies
