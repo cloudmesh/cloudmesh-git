@@ -115,3 +115,4 @@ class Manager(object):
 
                 repository_obj = self.org.get_repo(repo)
                 repository_obj.create_issue(title=title, body=content)
+

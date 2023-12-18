@@ -2,6 +2,8 @@ from cloudmesh.common.Shell import Shell
 from cloudmesh.common.util import path_expand
 from  pathlib import Path
 import os
+from cloudmesh.common.console import Console
+
 
 class Git:
 
@@ -74,3 +76,35 @@ class Git:
     def comitters():
         r =  Shell.run("git log --all --format='%an <%ae>' -- `git grep -l \"search string\"` | sort -u").strip()
         return r
+
+    def remove_tagged_version(tag, dryrun=False):
+        """
+        Removes a specified Git tag locally and pushes the deletion to the remote repository.
+
+        Args:
+            tag (str): The Git tag to be removed.
+            dryrun (bool): Flag indicating whether to perform a dry run.
+
+        Example:
+            Manager.remove_tagged_version("v1.0", dryrun=True)
+        """
+        found = Shell.run("git tag").strip().splitlines()
+
+        if tag in found:
+            print(f"Removing tag {tag}")
+
+            script = [
+                f"git tag -d {tag}",
+                f"git push origin :refs/tags/{tag}"
+            ]
+            if dryrun:
+                print("  " + '\n  '.join(script))
+            else:
+                try:
+                    for line in script:
+                        os.system(line)
+                    Console.ok(f"{tag} deleted")
+                except:
+                    Console.error("Deletion failed")
+        else:
+            Console.error(f"{tag} does not exist")
