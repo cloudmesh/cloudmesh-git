@@ -48,6 +48,7 @@ class GitCommand(PluginCommand):
                 git --refresh
                 git clone all [--force=no]
                 git pull all
+                git upload 
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
                 git delete [--tag=TAG] [--dryrun]
 
@@ -181,6 +182,10 @@ class GitCommand(PluginCommand):
             #print(Printer.write(r))
             print (r)
             return ""
+        
+        elif arguments.upload:
+            Git.upload()
+            return ""   
 
         elif arguments.contribution:
             r = Git.contributions_by_line()
