@@ -88,6 +88,13 @@ class Git:
         Example:
             Manager.remove_tagged_version("v1.0", dryrun=True)
         """
+
+        def add_prefix_to_lines(original_string, prefix):
+            lines = original_string.split('\n')
+            prefixed_lines = [prefix + line for line in lines]
+            result_string = '\n'.join(prefixed_lines)
+            return result_string
+
         found = Shell.run("git tag").strip().splitlines()
 
         if tag in found:
@@ -98,7 +105,8 @@ class Git:
                 f"git push origin :refs/tags/{tag}"
             ]
             if dryrun:
-                print("  " + '\n  '.join(script))
+                msg = "  " + '\n  '.join(script)
+                print(add_prefix_to_lines(msg, "dryrun"))
             else:
                 try:
                     for line in script:

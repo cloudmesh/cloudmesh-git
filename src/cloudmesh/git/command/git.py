@@ -49,7 +49,7 @@ class GitCommand(PluginCommand):
                 git clone all [--force=no]
                 git pull all
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
-                git rm --tag=TAG [--dryrun]
+                git delete [--tag=TAG] [--dryrun]
 
           This command does some useful things.
 
@@ -71,6 +71,7 @@ class GitCommand(PluginCommand):
                         ~/.cloudmesh/issuelist.json
              --tag=TAG  A list of tags that can be specified with number ranges.
                         E.g. v100.0.[4-6] will give the tags v100.0.4, v100.0.5, v100.0.6
+             --dryrun  onyl disply, but do not run the deletion
 
           Options:
               --force=no    pull the repository if it already exists in current working directory [default: no]
@@ -159,6 +160,7 @@ class GitCommand(PluginCommand):
 
         map_parameters(arguments,
                        'fetch',
+                       'dryrun'
                        'move',
                        'repo',
                        'file',
@@ -184,6 +186,13 @@ class GitCommand(PluginCommand):
             r = Git.contributions_by_line()
             print(Printer.write(r))
             return ""
+
+        elif arguments.delete:
+            tags = Parameter.expand(arguments["--tag"])
+            dryrun = arguments["--dryrun"]
+
+            for tag in tags:
+                Git.remove_tagged_version(tag, dryrun)
 
         elif arguments.list and arguments.all:
 
@@ -390,11 +399,5 @@ class GitCommand(PluginCommand):
                      directories=dirs,
                      move=move)
 
-        elif arguments.rm and arguments["--tag"]:
-            tags = Parameter.expand(arguments["--tag"])
-            dryrun = arguments["--dryrun"]
-
-            for tag in tags:
-                Manager.remove_tagged_version(tag, dryrun)
 
         return ""
