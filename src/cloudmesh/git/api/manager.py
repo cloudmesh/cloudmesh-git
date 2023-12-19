@@ -4,11 +4,9 @@ from pprint import pprint
 import requests
 from textwrap import dedent
 from pathlib import Path
-import time
 import csv
 from cloudmesh.common.util import readfile
-import subprocess
-import os
+
 
 class Manager(object):
 
@@ -24,36 +22,6 @@ class Manager(object):
 
         self.org = g.get_organization(organization)
         self.ta_team = self.org.get_team(2631498)
-
-
-    def upload(repo_url=None, commit_message='Initial commit'):
-        """
-        Create a new Git repository, add the code from the current directory, and push it to a remote repository.
-
-        Args:
-            repo_url (str): The URL of the remote repository.
-            commit_message (str, optional): The commit message. Defaults to 'Initial commit'.
-        """
-        if repo_url is None:
-            repo_name = os.path.basename(os.getcwd())
-            repo_url = f"git@github.com:cloudmesh/{repo_name}.git"
-
-        commands = f"""
-            git init'],
-            git add .],
-            git commit -m', {commit_message},
-            git remote add origin {repo_url},
-            git push -u origin master']
-        """.strip()
-
-        commands_list = commands.strip().split('\n')
-
-        for command in commands_list:
-            subprocess.run(command.split(), check=True)
-        
-
-        #for command in commands:
-        #    subprocess.run(command, check=True)
 
     def list(self, match=None):
         for r in self.org.get_repos():

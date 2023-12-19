@@ -3,9 +3,44 @@ from cloudmesh.common.util import path_expand
 from  pathlib import Path
 import os
 from cloudmesh.common.console import Console
-
+import time
+import subprocess
+import os
 
 class Git:
+
+    @staticmethod
+    def upload(repo_url=None, commit_message='Initial_commit'):
+        """
+        Create a new Git repository, add the code from the current directory, and push it to a remote repository.
+
+        Args:
+            repo_url (str): The URL of the remote repository.
+            commit_message (str, optional): The commit message. Defaults to 'Initial commit'.
+        """
+
+        if repo_url is None:
+            repo_name = os.path.basename(os.getcwd())
+            repo_url = f"git@github.com:cloudmesh/{repo_name}.git"
+
+        commands = f"""
+            git init
+            git add .
+            git commit -m {commit_message}
+            git remote add origin {repo_url}
+            git push -u origin main
+        """.strip()
+
+        commands_list = commands.strip().split('\n')
+
+        for command in commands_list:
+            try:
+                subprocess.run(command.split(), check=True)
+            except:
+                pass    
+
+        #for command in commands:
+        #    subprocess.run(command, check=True)
 
     @staticmethod
     def root (path):
