@@ -47,7 +47,8 @@ class GitCommand(PluginCommand):
                 git set ssh [DIRS]
                 git --refresh
                 git clone all [--force=no]
-                git pull all
+                git pull all [--dryrun]
+                git pull DIRS...
                 git upload 
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
                 git delete [--tag=TAG] [--dryrun]
@@ -323,6 +324,7 @@ class GitCommand(PluginCommand):
             repos = readfile(filename).splitlines()
             failed_repos = []
             forcing_pull = str_bool(arguments["--force"])
+            dryrun = arguments.dryrun
             for repo in repos:
                 url = f"git@github.com:{repo}.git"
                 org = os.path.dirname(repo)
@@ -338,7 +340,10 @@ class GitCommand(PluginCommand):
                             pull_command = f"cd {org}; cd {name}; git pull"
                             banner(pull_command)
                             try:
-                                r2 = Shell.run(pull_command)
+                                if dryrun:
+                                    print(command)
+                                else:
+                                    r2 = Shell.run(pull_command)
                                 Console.ok(f"Pulled {repo} since it already exists.")
                             except subprocess.CalledProcessError as e2:
                                 Console.error(f"Failed to pull {repo}. Continuing...")
@@ -392,6 +397,14 @@ class GitCommand(PluginCommand):
                 command = f"git -C {path} pull"
                 banner(command)
                 os.system(command)
+
+        elif arguments.pull and arguments["DIRS"]:
+
+            for path in arguments["DIRS"]:
+                command = f"git -C {path} pull"
+                banner(command)
+                os.system(command)
+
 
         elif arguments.copy:
             dirs = arguments.DIRS
