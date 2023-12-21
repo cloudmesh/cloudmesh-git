@@ -7,9 +7,97 @@ import time
 import subprocess
 import os
 import os
+import requests
 
 class Git:
 
+    @staticmethod
+    def reponame(repo):
+        """
+        Returns the repository name. If it starts with 'cloudmesh-', prefix 'cloudmesh/' is added.
+
+        Args:
+            repo (str): The name of the repository.
+
+        Returns:
+            str: The modified repository name.
+        """
+        if repo.startswith('cloudmesh-'):
+            return f'cloudmesh/{repo}'
+        else:
+            return repo
+
+    @staticmethod
+    def fetch_latest_release_version(repo):
+        # repo = cloudmesh/cloudmesh-git
+        repo = Git.reponame(repo)
+
+        url = f"https://api.github.com/repos/{repo}/releases/latest"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            latest_version = data["tag_name"]
+            return latest_version
+        else:
+            return None
+    
+    @staticmethod
+    def fetch_version_from_git_repo(repo):
+        repo = Git.reponame(repo)
+        
+        url = f"https://raw.githubusercontent.com/{repo}/main/VERSION"
+        response = requests.get(url)
+        if response.status_code == 200:
+            version = response.text.strip()
+            return version
+        else:
+            return None
+            
+    @staticmethod
+    def fetch_latest_pypi_version(package_name):
+        """
+        Fetch the latest version of a package from PyPI.
+
+        Args:
+            package_name (str): The name of the package.
+
+        Returns:
+            str: The latest version of the package, or None if the package was not found.
+        """
+        url = f"https://pypi.org/pypi/{package_name}/json"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            latest_version = data["info"]["version"]
+            return latest_version
+        else:
+            return None
+    
+    @staticmethod
+    def get_versions(package_name):
+        """
+        Compares the versions of a Git repository with the versions available on PyPI.
+
+        Args:
+            repo (str): The URL of the Git repository.
+
+        Returns:
+            bool: True if the Git repository versions match the PyPI versions, False otherwise.
+        """
+        repo = Git.reponame(package_name)
+        github_version = Git.fetch_version_from_git_repo(repo)
+        pypi_version = Git.fetch_latest_pypi_version(package_name=package_name)
+        
+        VERSION = None
+
+        if os.path.isfile("VERSION"):
+            VERSION = Path("VERSION").read_text().strip()   
+
+        return {
+            "VERSION": VERSION,
+            "github_version": github_version, 
+            "pypi_version": pypi_version}
+        
     @staticmethod
     def find_git_directories(directory):
         git_directories = []

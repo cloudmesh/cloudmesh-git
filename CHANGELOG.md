@@ -1,10 +1,15 @@
 # Changelog
 
+## 5.0.4
+
+* add `cms	git versions`	printing the versions locally, from github and pypi
+
+
 ## 5.0.3
 
 * Update Readme
 * Update pyproject.toml
-* add `cms	git log``	which creates a very short log
+* add `cms	git log`	which creates a very short log
 
 
 ## 5.0.2

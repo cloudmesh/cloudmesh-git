@@ -51,6 +51,7 @@ class GitCommand(PluginCommand):
                 git pull DIRS... [--dryrun]
                 git upload 
                 git log
+                git versions [--repo=REPO]
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
                 git delete [--tag=TAG] [--dryrun]
 
@@ -187,6 +188,19 @@ class GitCommand(PluginCommand):
             r = Git.comitters()
             #print(Printer.write(r))
             print (r)
+            return ""
+        
+        elif arguments.versions:
+
+            repo = arguments.repo
+            if repo is None:
+                repo = Git.repo(".")
+
+            versions = Git.get_versions(repo)
+
+            print (f"{'VERSION:':<15} {versions['VERSION']}")
+            print (f"{'Github version:':<15} {versions['github_version']}")
+            print (f"{'PyPI version:':<15} {versions['pypi_version']}")
             return ""
         
         elif arguments.log:
