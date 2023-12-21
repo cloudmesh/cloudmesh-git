@@ -50,6 +50,7 @@ class GitCommand(PluginCommand):
                 git pull all [--dryrun]
                 git pull DIRS... [--dryrun]
                 git upload 
+                git log
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
                 git delete [--tag=TAG] [--dryrun]
 
@@ -137,6 +138,9 @@ class GitCommand(PluginCommand):
                     Creates html file of all issues assigned to logged-in
                     user. assumes that the user is standing in cm
                     directory
+                
+                git log
+                    A very short log sorted by date
 
           Examples:
 
@@ -184,6 +188,11 @@ class GitCommand(PluginCommand):
             #print(Printer.write(r))
             print (r)
             return ""
+        
+        elif arguments.log:
+            os.system('git log '
+                      ' --pretty="%C(Yellow)%h  %C(reset)%ad (%C(Green)%cr%C(reset))%x09 %C(Cyan)%an: %C(reset)%s"'
+                      ' --date=short')
         
         elif arguments.upload:
             Git.upload()
