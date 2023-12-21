@@ -22,6 +22,34 @@ see cloudmesh.cmd5
 * https://github.com/cloudmesh/cloudmesh.cmd5
 
 
+## Installation
+
+```bash
+pip install cloudmesh-git
+```
+
+## Development Intsllation
+
+```bash
+git clone https://github.com/cloudmesh/cloudmesh-git.git
+git clone https://github.com/cloudmesh/cloudmesh-common.git
+cd cloudmesh-git
+```
+
+To create a while instalation you can say
+
+```bash
+make local
+```
+
+To create an editable instalation with pip use
+
+```bash
+make pip
+```
+
+
+
 ## TODO
 
 * create gh class

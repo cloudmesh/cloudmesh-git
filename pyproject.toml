@@ -59,8 +59,12 @@ dependencies = [
     "PyGithub"
 ]
 [project.urls]
-"Documentation" = "https://github.com/cloudmesh/cloudmesh-common"
-"Changelog" = "https://github.com/cloudmesh/cloudmesh-common/CHANGELOG.md"
+Homepage = "https://github.com/cloudmesh/cloudmesh-git"
+Documentation = "https://github.com/cloudmesh/cloudmesh-git/blob/main/README.md"
+Repository = "https://github.com/cloudmesh/cloudmesh-git.git"
+Issues = "https://github.com/cloudmesh/cloudmesh-git/issues"
+Changelog = "https://github.com/cloudmesh/cloudmesh-git/blob/main/CHANGELOG.md"
+
 
 [tool.setuptools.packages.find]
 where = ["src/"]
