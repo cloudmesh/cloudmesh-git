@@ -2,8 +2,9 @@
 
 ## 5.0.4
 
-* add `cms	git versions`	printing the versions locally, from github and pypi
-
+* add `cms git versions` printing the versions locally, from github and pypi
+* add `cms git status` DIRS printing the status specified dirs
+* used a function to implement both `cms git status pull/push`
 
 ## 5.0.3
 

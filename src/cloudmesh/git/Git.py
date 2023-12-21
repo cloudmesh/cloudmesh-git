@@ -8,8 +8,31 @@ import subprocess
 import os
 import os
 import requests
+from cloudmesh.common.util import banner
 
 class Git:
+
+    @staticmethod
+    def execute_git_command(dirs, command, dryrun=False):
+        """
+        Execute a git command on the specified directories.
+
+        Args:
+            dirs (list): The list of directories the commandis run in.
+            command (str): The git command to execute.
+        """
+        if dirs == ['.']:
+            directories = Git.find_git_directories(".")
+        else:
+            directories = dirs
+
+        for path in directories:
+            git_command = f"git -C {path} {command}"
+            if dryrun:
+                print(git_command)
+            else:
+                banner(git_command)
+                os.system(git_command)
 
     @staticmethod
     def reponame(repo):

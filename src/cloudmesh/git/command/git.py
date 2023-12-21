@@ -49,6 +49,7 @@ class GitCommand(PluginCommand):
                 git clone all [--force=no]
                 git pull all [--dryrun]
                 git pull DIRS... [--dryrun]
+                git status DIRS... [--dryrun]
                 git upload 
                 git log
                 git versions [--repo=REPO]
@@ -428,19 +429,11 @@ class GitCommand(PluginCommand):
                     #os.system(command)
 
         elif arguments.pull and arguments["DIRS"]:
-            
-            if arguments["DIRS"] == ['.']:
-                directories = Git.find_git_directories(".")
-            else:
-               directories = arguments["DIRS"]
+            Git.execute_git_command(arguments["DIRS"], 'pull', dryrun=arguments.dryrun)
 
-            for path in directories:
-                command = f"git -C {path} pull"
-                if arguments.dryrun:
-                    print(command)
-                else:
-                    banner(command)
-                    os.system(command)
+        elif arguments.status and arguments["DIRS"]:
+            Git.execute_git_command(arguments["DIRS"], 'status', dryrun=arguments.dryrun)
+    
 
 
         elif arguments.copy:
