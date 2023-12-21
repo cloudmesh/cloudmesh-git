@@ -6,9 +6,30 @@ from cloudmesh.common.console import Console
 import time
 import subprocess
 import os
+import os
 
 class Git:
 
+    @staticmethod
+    def find_git_directories(directory):
+        git_directories = []
+        
+        for subdir in os.listdir(directory):
+            subdir_path = os.path.join(directory, subdir)
+            if os.path.isdir(subdir_path):
+                if Git.is_git_repository(subdir_path):
+                    git_directories.append(subdir_path)
+                
+        return git_directories
+
+    @staticmethod
+    def is_git_repository(directory):
+        try:
+            subprocess.check_output(['git', 'rev-parse', '--is-inside-work-tree'], cwd=directory)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+            
     @staticmethod
     def upload(repo_url=None, commit_message='Initial_commit'):
         """

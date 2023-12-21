@@ -48,7 +48,7 @@ class GitCommand(PluginCommand):
                 git --refresh
                 git clone all [--force=no]
                 git pull all [--dryrun]
-                git pull DIRS...
+                git pull DIRS... [--dryrun]
                 git upload 
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
                 git delete [--tag=TAG] [--dryrun]
@@ -84,28 +84,28 @@ class GitCommand(PluginCommand):
                 cloudmesh-community
 
                 git --refresh
-                    finds all organizations and repositories the current user belongs to
+                    Finds all organizations and repositories the current user belongs to
                     redirects automatically to ~/cloudmesh/git/repo-list.txt
 
                 git clone all [--force=no]
-                    uses all organizations and repositories of the user and
+                    Uses all organizations and repositories of the user and
                     clones them into the current directory, while making each
                     organization in its own subdirectory
                     uses automatically ~/cloudmesh/git/repo-list.txt
                     which can be created with cms git list all.
-                    if force is yes then it pulls preexisting directories
+                    if force is yes then it pulls preexisting directories.
 
                 git set ssh
-                    switches the repository to use ssh
+                    Switches the repository to use ssh
 
                 git list --org=ORG
-                    lists the repos of the organization
+                    Lists the repos of the organization
 
                 git list all [--exclude=ORG]
-                    gets info of all repos of the current in user. It puts
+                    Gets info of all repos of the current in user. It puts
                     the result in ~/.cloudmesh/gitcache.txt.
                     To exclude an organization, add it to the end of exclude
-                    parameter
+                    parameter.
 
                 git create issue --repo=REPO FILE
                    Create an issue in the given repos.
@@ -117,23 +117,24 @@ class GitCommand(PluginCommand):
                    The bundle is defined in cloudmesh-installer
 
                 git create repo NAME FIRSTNAME LASTNAME GITHUBID
-                    creates the repo
+                    Creates the repo
 
                 git create repo --file=repos.csv
-                    creates repos from a file in csv format
+                    Creates repos from a file in csv format
                     the format in th csv file is
 
                     reponame,lastname,firstname,githubid
 
                 git copy FROM TO
-                    copies a directory from one repo to the other
+                    Copies a directory from one repo to the other.
 
-                git pull all
-                    git pulls all directories and subdirectories of
-                    current working directory
+                git pull cloudmesh-*
+                    Assuming in your directory there are cloudmesh source repositories
+                    this command does a git pull on all of them. Using . as the directory 
+                    will pull all repos in the current directory.
 
                 git issuelist
-                    creates html file of all issues assigned to logged-in
+                    Creates html file of all issues assigned to logged-in
                     user. assumes that the user is standing in cm
                     directory
 
@@ -143,15 +144,15 @@ class GitCommand(PluginCommand):
 
                     git copy cloudmesh/cloudmesh-cloud cloudmesh/cloudmesh-db admin
 
-                    creates a script move.sh that copies the directory admin
+                    Creates a script move.sh that copies the directory admin
                     with history to the cloudmesh-db repo into a folder move
 
-                    from there you can use git mv to place the content where you
+                    From there you can use git mv to place the content where you
                     like. The reason we put it in move is that there may be another
                     dir already in it with tha name.
 
                git list Park
-                  Lists all repos with the name Park in it or its description
+                    Lists all repos with the name Park in it or its description
 
                git list fa19-523
                     Lists all repos with the string  fa19-523 in its name
@@ -162,7 +163,7 @@ class GitCommand(PluginCommand):
 
         map_parameters(arguments,
                        'fetch',
-                       'dryrun'
+                       'dryrun',
                        'move',
                        'repo',
                        'file',
@@ -393,17 +394,30 @@ class GitCommand(PluginCommand):
             os.system(f"{location} git remote set-url origin git@github.com:{org}/{repo}.git")
 
         elif arguments.pull and arguments.all:
-            for path in glob.glob(f'./**/', recursive=True):
+            directories = Git.find_git_directories(".")
+            VERBOSE(arguments)
+            for path in directories:
                 command = f"git -C {path} pull"
-                banner(command)
-                os.system(command)
+                if arguments.dryrun:
+                    print(command)
+                else:
+                    banner(command)
+                    #os.system(command)
 
         elif arguments.pull and arguments["DIRS"]:
+            
+            if arguments["DIRS"] == ['.']:
+                directories = Git.find_git_directories(".")
+            else:
+               directories = arguments["DIRS"]
 
-            for path in arguments["DIRS"]:
+            for path in directories:
                 command = f"git -C {path} pull"
-                banner(command)
-                os.system(command)
+                if arguments.dryrun:
+                    print(command)
+                else:
+                    banner(command)
+                    os.system(command)
 
 
         elif arguments.copy:
