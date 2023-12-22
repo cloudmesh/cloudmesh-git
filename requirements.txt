@@ -1,2 +1,5 @@
-# not yet
-PyGithubs
+    toml
+    cloudmesh-cmd5
+    cloudmesh-configuration
+    pygments
+    PyGithub
