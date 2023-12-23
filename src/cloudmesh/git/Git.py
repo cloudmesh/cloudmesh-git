@@ -107,6 +107,10 @@ class Git:
         Returns:
             bool: True if the Git repository versions match the PyPI versions, False otherwise.
         """
+        print(f"Checking versions for {package_name}")
+
+        if package_name == ".":
+            package_name = os.path.basename(os.getcwd())
         repo = Git.reponame(package_name)
         github_version = Git.fetch_version_from_git_repo(repo)
         pypi_version = Git.fetch_latest_pypi_version(package_name=package_name)

@@ -195,7 +195,7 @@ class GitCommand(PluginCommand):
 
             repo = arguments.repo
             if repo is None:
-                repo = Git.repo(".")
+                repo = "."
 
             versions = Git.get_versions(repo)
 
