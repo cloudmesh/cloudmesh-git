@@ -199,9 +199,12 @@ class GitCommand(PluginCommand):
 
             versions = Git.get_versions(repo)
 
-            print (f"{'VERSION:':<15} {versions['VERSION']}")
-            print (f"{'Github version:':<15} {versions['github_version']}")
-            print (f"{'PyPI version:':<15} {versions['pypi_version']}")
+
+            
+            indent = max(len(key) for key in versions.keys()) 
+
+            for key, value in versions.items():
+                print(f"{key:<{indent}}: {value}")
             return ""
         
         elif arguments.log:

@@ -9,6 +9,9 @@ import os
 import os
 import requests
 from cloudmesh.common.util import banner
+from datetime import datetime
+import humanize
+    
 
 class Git:
 
@@ -120,11 +123,47 @@ class Git:
         if os.path.isfile("VERSION"):
             VERSION = Path("VERSION").read_text().strip()   
 
-        return {
-            "VERSION": VERSION,
-            "github_version": github_version, 
-            "pypi_version": pypi_version}
+        last_commit_hash = Shell.run('git rev-parse HEAD').strip()
+        last_commit_date = Shell.run('git show -s --format=%ci ' + last_commit_hash).strip()
+
+        last_tag_hash = Shell.run('git rev-list --tags --max-count=1').strip()
+        last_tag_date = Shell.run('git show -s --format=%ci ' + last_tag_hash).strip()
+
+        def calculate_time_difference(start_date, end_date):
+            start_datetime = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+            end_datetime = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+            time_difference = end_datetime - start_datetime
+            days = time_difference.days
+            hours, remainder = divmod(time_difference.seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+            return f"{days}d {hours}h {minutes}m"
+
+        # Example usage
+        start_date = "2022-01-01 12:00:00"
+        end_date = "2022-01-02 14:30:00"
+        time_difference = calculate_time_difference(start_date, end_date)
         
+        return {
+                "VERSION": VERSION,
+                "github_version": github_version, 
+                "pypi_version": pypi_version,
+                "last_commit_hash": last_commit_hash,
+                "last_version_hash": last_tag_hash,
+                "last_commit_date": last_commit_date,
+                "time_difference": time_difference,
+                "last_version_date": last_tag_date,
+                "commits_after_tag": Git.count_commits_between_latest_tag_and_head()
+        }
+
+
+    @staticmethod
+    def count_commits_between_latest_tag_and_head():
+        latest_tag = subprocess.getoutput("git describe --tags `git rev-list --tags --max-count=1`")
+        commit_count = subprocess.getoutput(f'git rev-list --count {latest_tag}..HEAD')
+        print ("LLL", latest_tag, commit_count  )
+        return int(commit_count)
+
+    
     @staticmethod
     def find_git_directories(directory):
         git_directories = []
