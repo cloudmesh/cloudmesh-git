@@ -162,6 +162,24 @@ class GitCommand(PluginCommand):
                git list fa19-523
                     Lists all repos with the string  fa19-523 in its name
 
+                cms git versions
+                    returns information about the versions of the current repo. An example is
+
+                    > Checking versions for .
+                    > current_branch   : main
+                    > latest_tag       : v5.0.5
+                    > VERSION          : 5.0.5
+                    > github_version   : 5.0.5
+                    > pypi_version     : 5.0.5
+                    > last_commit_hash : aa29c031f22af42f8e54af44afbf5d8ca4d801fe
+                    > last_version_hash: d82b47cc62c6149d4d14b471a38d85dd5a43a93a
+                    > last_commit_date : 2023-12-22 21:08:13 -0500
+                    > last_version_date: 2023-12-22 21:05:29 -0500
+                    > time_difference  : 2m 44s
+                    > commits_after_tag: 1
+
+1. add branch on cms git versions
+
 
         """
         # arguments.FILE = arguments['--file'] or None

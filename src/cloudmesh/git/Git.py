@@ -158,8 +158,10 @@ class Git:
         time_difference = Git.calculate_time_difference(last_tag_date, last_commit_date)
         current_branch = Shell.run("git rev-parse --abbrev-ref HEAD").strip()
     
+        latest_tag = Shell.run("git describe --tags `git rev-list --tags --max-count=1`").strip()
         return {
             "current_branch": current_branch,
+            "latest_tag": latest_tag,
             "VERSION": VERSION,
             "github_version": github_version,
             "pypi_version": pypi_version,
@@ -191,7 +193,6 @@ class Git:
             "git describe --tags `git rev-list --tags --max-count=1`"
         )
         commit_count = subprocess.getoutput(f"git rev-list --count {latest_tag}..HEAD")
-        print("LLL", latest_tag, commit_count)
         return int(commit_count)
 
     @staticmethod
