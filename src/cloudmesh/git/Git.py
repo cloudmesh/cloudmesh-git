@@ -146,7 +146,7 @@ class Git:
         last_tag_hash = Shell.run("git rev-list --tags --max-count=1").strip()
         last_tag_date = Shell.run("git show -s --format=%ci " + last_tag_hash).strip()
 
-        time_difference = Git.calculate_time_difference(last_commit_date, last_tag_date)
+        time_difference = Git.calculate_time_difference(last_tag_date, last_commit_date)
         
     
         return {
