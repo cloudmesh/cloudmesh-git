@@ -107,11 +107,20 @@ class Git:
         hours, remainder = divmod(time_difference.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         
+        result = ""
         if days == 0 and hours == 0 and minutes == 0 and seconds == 0:
             result = "0"
         else:
-            result = f"{days}d {hours}h {minutes}m {seconds}s"
-            
+            if days != 0:
+                result += f"{days}d "
+            if hours != 0:
+                result += f"{hours}h "
+            if minutes != 0:
+                result += f"{minutes}m "
+            if seconds != 0:
+                result += f"{seconds}s"
+
+        result = result.strip()  # Remove trailing space
         return result
 
     @staticmethod
