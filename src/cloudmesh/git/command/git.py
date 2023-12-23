@@ -28,7 +28,6 @@ from cloudmesh.common.parameter import Parameter
 
 
 class GitCommand(PluginCommand):
-
     # noinspection PyUnusedLocal
     @command
     def do_git(self, args, arguments):
@@ -50,7 +49,7 @@ class GitCommand(PluginCommand):
                 git pull all [--dryrun]
                 git pull DIRS... [--dryrun]
                 git status DIRS... [--dryrun]
-                git upload 
+                git upload
                 git log
                 git versions [--repo=REPO]
                 git issues [--repo=REPO] [--assignee=ASSIGNEE] [--format=HTML] [--out=a.html] [--refresh]
@@ -133,14 +132,14 @@ class GitCommand(PluginCommand):
 
                 git pull cloudmesh-*
                     Assuming in your directory there are cloudmesh source repositories
-                    this command does a git pull on all of them. Using . as the directory 
+                    this command does a git pull on all of them. Using . as the directory
                     will pull all repos in the current directory.
 
                 git issuelist
                     Creates html file of all issues assigned to logged-in
                     user. assumes that the user is standing in cm
                     directory
-                
+
                 git log
                     A very short log sorted by date
 
@@ -167,15 +166,9 @@ class GitCommand(PluginCommand):
         """
         # arguments.FILE = arguments['--file'] or None
 
-        map_parameters(arguments,
-                       'fetch',
-                       'dryrun',
-                       'move',
-                       'repo',
-                       'file',
-                       'title',
-                       'assignee'
-                       )
+        map_parameters(
+            arguments, "fetch", "dryrun", "move", "repo", "file", "title", "assignee"
+        )
         move = arguments.move or "move"
 
         # VERBOSE(arguments)
@@ -187,34 +180,33 @@ class GitCommand(PluginCommand):
 
         if arguments.committers:
             r = Git.comitters()
-            #print(Printer.write(r))
-            print (r)
+            # print(Printer.write(r))
+            print(r)
             return ""
-        
-        elif arguments.versions:
 
+        elif arguments.versions:
             repo = arguments.repo
             if repo is None:
                 repo = "."
 
             versions = Git.get_versions(repo)
 
-
-            
-            indent = max(len(key) for key in versions.keys()) 
+            indent = max(len(key) for key in versions.keys())
 
             for key, value in versions.items():
                 print(f"{key:<{indent}}: {value}")
             return ""
-        
+
         elif arguments.log:
-            os.system('git log '
-                      ' --pretty="%C(Yellow)%h  %C(reset)%ad (%C(Green)%cr%C(reset))%x09 %C(Cyan)%an: %C(reset)%s"'
-                      ' --date=short')
-        
+            os.system(
+                "git log "
+                ' --pretty="%C(Yellow)%h  %C(reset)%ad (%C(Green)%cr%C(reset))%x09 %C(Cyan)%an: %C(reset)%s"'
+                " --date=short"
+            )
+
         elif arguments.upload:
             Git.upload()
-            return ""   
+            return ""
 
         elif arguments.contribution:
             r = Git.contributions_by_line()
@@ -229,7 +221,6 @@ class GitCommand(PluginCommand):
                 Git.remove_tagged_version(tag, dryrun)
 
         elif arguments.list and arguments.all:
-
             command = "gh api  /user/memberships/orgs"
             r = Shell.run(command)
             # print(r)
@@ -261,7 +252,7 @@ class GitCommand(PluginCommand):
 
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             writefile(filename, "\n".join(repos))
-            Console.ok(f'\nWritten list of repos to {filename}')
+            Console.ok(f"\nWritten list of repos to {filename}")
 
         # elif arguments["list"]:
 
@@ -293,35 +284,36 @@ class GitCommand(PluginCommand):
             pprint(repos)
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             writefile(filename, "\n".join(repos))
-            Console.ok(f'\nWritten list of repos to {filename}')
+            Console.ok(f"\nWritten list of repos to {filename}")
 
         elif arguments.issues:
-
             github = Gh()
 
             # currently only allowing one user
-            #if arguments.assignee is not None:
+            # if arguments.assignee is not None:
             #    assignee = Parameter.expand(arguments.assignee)[0]
             # TODO: assignee = Parameter.expand(arguments.assignee)
             assignee = arguments.assignee
-            if arguments.repo in ['.', "cwd", None]:
+            if arguments.repo in [".", "cwd", None]:
                 repos = github.repos_in_dir()
             elif arguments.repo in ["pi"]:
                 repos = ["cloudmesh-pi-burn", "cloudmesh-pi-cluster", "cloudmesh-git"]
             elif arguments.repo in ["reu"]:
-                repos = ["reu2022",
-                         "cloudmesh-slurm",
-                         "cloudmesh-mpi",
-                         "cloudmesh-pi-burn",
-                         "cloudmesh-pi-cluster",
-                         "cloudmesh-git",
-                         "cloudmesh-catalog",
-                         "cloudmesh-common",
-                         "cloudmesh-data",
-                         "cloudmesh-sbatch",
-                         "book",
-                         "bookmanager",
-                         "yamldb"]
+                repos = [
+                    "reu2022",
+                    "cloudmesh-slurm",
+                    "cloudmesh-mpi",
+                    "cloudmesh-pi-burn",
+                    "cloudmesh-pi-cluster",
+                    "cloudmesh-git",
+                    "cloudmesh-catalog",
+                    "cloudmesh-common",
+                    "cloudmesh-data",
+                    "cloudmesh-sbatch",
+                    "book",
+                    "bookmanager",
+                    "yamldb",
+                ]
 
             refresh = arguments["--refresh"] or not github.cache_exists()
             if refresh:
@@ -364,7 +356,9 @@ class GitCommand(PluginCommand):
                     Console.ok(f"Successfully cloned {repo}.")
                 except subprocess.CalledProcessError as e:
                     if forcing_pull:
-                        if "already exists and is not an empty directory" in str(e.output):
+                        if "already exists and is not an empty directory" in str(
+                            e.output
+                        ):
                             pull_command = f"cd {org}; cd {name}; git pull"
                             banner(pull_command)
                             try:
@@ -378,7 +372,9 @@ class GitCommand(PluginCommand):
                                 failed_repos.append(repo)
                                 continue
                     else:
-                        if "already exists and is not an empty directory" in str(e.output):
+                        if "already exists and is not an empty directory" in str(
+                            e.output
+                        ):
                             Console.ok(f"Skipping {repo} because it already exists.")
                         else:
                             Console.error(f"Failed to clone {repo}. Continuing...")
@@ -387,7 +383,7 @@ class GitCommand(PluginCommand):
             if failed_repos:
                 Console.error(f"These repos failed to clone:\n")
                 for failed_repo in failed_repos:
-                    print(f'{failed_repo}\n')
+                    print(f"{failed_repo}\n")
 
         elif arguments.create and arguments.repo is not None:
             """
@@ -402,13 +398,11 @@ class GitCommand(PluginCommand):
             m.issue(repos=repos, title=title, file=file)
 
         elif arguments.repository and arguments.file and not arguments.issue:
-
             m = Manager()
             filename = arguments.file
             m.create_repos(filename=filename)
 
         elif arguments.ssh and arguments.set:
-
             dirs = arguments["DIRS"] or "."
             org = "get the org from the current dir in .git"
             repo = "get the repo from the current dir in .git"
@@ -418,7 +412,9 @@ class GitCommand(PluginCommand):
                     location = ""
                 else:
                     location = "cd {d}; "
-            os.system(f"{location} git remote set-url origin git@github.com:{org}/{repo}.git")
+            os.system(
+                f"{location} git remote set-url origin git@github.com:{org}/{repo}.git"
+            )
 
         elif arguments.pull and arguments.all:
             directories = Git.find_git_directories(".")
@@ -429,15 +425,15 @@ class GitCommand(PluginCommand):
                     print(command)
                 else:
                     banner(command)
-                    #os.system(command)
+                    # os.system(command)
 
         elif arguments.pull and arguments["DIRS"]:
-            Git.execute_git_command(arguments["DIRS"], 'pull', dryrun=arguments.dryrun)
+            Git.execute_git_command(arguments["DIRS"], "pull", dryrun=arguments.dryrun)
 
         elif arguments.status and arguments["DIRS"]:
-            Git.execute_git_command(arguments["DIRS"], 'status', dryrun=arguments.dryrun)
-    
-
+            Git.execute_git_command(
+                arguments["DIRS"], "status", dryrun=arguments.dryrun
+            )
 
         elif arguments.copy:
             dirs = arguments.DIRS
@@ -445,10 +441,8 @@ class GitCommand(PluginCommand):
             destination = arguments.TO
             move = arguments.move
 
-            copy_dir(original=original,
-                     destination=destination,
-                     directories=dirs,
-                     move=move)
-
+            copy_dir(
+                original=original, destination=destination, directories=dirs, move=move
+            )
 
         return ""
