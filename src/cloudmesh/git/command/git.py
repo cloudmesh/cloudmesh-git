@@ -195,6 +195,16 @@ class GitCommand(PluginCommand):
 
             for key, value in versions.items():
                 print(f"{key:<{indent}}: {value}")
+
+            if repo == ".":
+                if versions["commits_after_tag"]> 0:
+                    commits = Git.get_last_commit_messages(versions["commits_after_tag"])
+                    counter = 0
+                    print()
+                    for message in commits:
+                        counter += 1
+                        print(f"{counter}. {message}")
+                    print()
             return ""
 
         elif arguments.log:

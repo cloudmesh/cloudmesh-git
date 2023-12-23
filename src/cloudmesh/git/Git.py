@@ -171,6 +171,20 @@ class Git:
         }
 
     @staticmethod
+    def get_last_commit_messages(n):
+        """
+        Get the last n commit messages.
+
+        Args:
+            n (int): The number of commit messages to return.
+
+        Returns:
+            list: The last n commit messages.
+        """
+        commit_messages = Shell.run(f"git log -n {n} --pretty=format:%s").strip().splitlines()
+        return commit_messages
+    
+    @staticmethod
     def count_commits_between_latest_tag_and_head():
         latest_tag = subprocess.getoutput(
             "git describe --tags `git rev-list --tags --max-count=1`"
