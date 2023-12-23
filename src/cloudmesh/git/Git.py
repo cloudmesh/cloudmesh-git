@@ -156,9 +156,10 @@ class Git:
         last_tag_date = Shell.run("git show -s --format=%ci " + last_tag_hash).strip()
 
         time_difference = Git.calculate_time_difference(last_tag_date, last_commit_date)
-        
+        current_branch = Shell.run("git rev-parse --abbrev-ref HEAD").strip()
     
         return {
+            "current_branch": current_branch,
             "VERSION": VERSION,
             "github_version": github_version,
             "pypi_version": pypi_version,
