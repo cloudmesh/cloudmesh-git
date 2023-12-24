@@ -15,6 +15,43 @@ import humanize
 
 class Git:
     @staticmethod
+    def execute_git_command_filter(
+        dirs, command, dryrun=False, does_not_contain=None, verbose=False
+    ):
+        """
+        Execute a git command on the specified directories.
+
+        Args:
+            dirs (list): The list of directories the command is run in.
+            command (str): The git command to execute.
+            does_not_contain (str): The string to check if it is not present in the command output.
+        """
+        if dirs == ["."]:
+            directories = Git.find_git_directories(".")
+        else:
+            directories = dirs
+
+        for path in directories:
+            git_command = f"git -C {path} {command}"
+            if dryrun:
+                print(git_command)
+            else:
+                try:
+                    output = subprocess.check_output(
+                        git_command, shell=True, universal_newlines=True
+                    )
+                    if does_not_contain in output:
+                        #banner(git_command + " ok")
+                        pass
+                    else:
+                        print("#", git_command, "changed")
+                        if verbose:
+                            banner(path)
+                            print(output)
+                except subprocess.CalledProcessError as e:
+                    print("#", git_command, "failed")
+
+    @staticmethod
     def execute_git_command(dirs, command, dryrun=False):
         """
         Execute a git command on the specified directories.
@@ -106,7 +143,7 @@ class Git:
         days = time_difference.days
         hours, remainder = divmod(time_difference.seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        
+
         result = ""
         if days == 0 and hours == 0 and minutes == 0 and seconds == 0:
             result = "0"
@@ -157,8 +194,10 @@ class Git:
 
         time_difference = Git.calculate_time_difference(last_tag_date, last_commit_date)
         current_branch = Shell.run("git rev-parse --abbrev-ref HEAD").strip()
-    
-        latest_tag = Shell.run("git describe --tags `git rev-list --tags --max-count=1`").strip()
+
+        latest_tag = Shell.run(
+            "git describe --tags `git rev-list --tags --max-count=1`"
+        ).strip()
         return {
             "current_branch": current_branch,
             "latest_tag": latest_tag,
@@ -184,9 +223,11 @@ class Git:
         Returns:
             list: The last n commit messages.
         """
-        commit_messages = Shell.run(f"git log -n {n} --pretty=format:%s").strip().splitlines()
+        commit_messages = (
+            Shell.run(f"git log -n {n} --pretty=format:%s").strip().splitlines()
+        )
         return commit_messages
-    
+
     @staticmethod
     def count_commits_between_latest_tag_and_head():
         latest_tag = subprocess.getoutput(

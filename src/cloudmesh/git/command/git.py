@@ -47,8 +47,8 @@ class GitCommand(PluginCommand):
                 git --refresh
                 git clone all [--force=no]
                 git pull all [--dryrun]
-                git pull DIRS... [--dryrun]
-                git status DIRS... [--dryrun]
+                git pull [--dryrun] DIRS... 
+                git status [--dryrun] [--changed] [--verbose] DIRS... 
                 git upload
                 git log
                 git versions [--repo=REPO]
@@ -76,6 +76,8 @@ class GitCommand(PluginCommand):
              --tag=TAG  A list of tags that can be specified with number ranges.
                         E.g. v100.0.[4-6] will give the tags v100.0.4, v100.0.5, v100.0.6
              --dryrun  onyl disply, but do not run the deletion
+             --changed  only display repos that have changes
+             --verbose  prints verbose information
 
           Options:
               --force=no    pull the repository if it already exists in current working directory [default: no]
@@ -185,7 +187,16 @@ class GitCommand(PluginCommand):
         # arguments.FILE = arguments['--file'] or None
 
         map_parameters(
-            arguments, "fetch", "dryrun", "move", "repo", "file", "title", "assignee"
+            arguments, 
+            "fetch", 
+            "dryrun",
+            "changed", 
+            "verbose",
+            "move", 
+            "repo", 
+            "file", 
+            "title", 
+            "assignee"
         )
         move = arguments.move or "move"
 
@@ -221,7 +232,9 @@ class GitCommand(PluginCommand):
                     print()
                     for message in commits:
                         counter += 1
-                        print(f"{counter}. {message}")
+                        
+                        #    print(f"{counter}. {message}")
+                        print(f"* {message}")
                     print()
             return ""
 
@@ -458,7 +471,16 @@ class GitCommand(PluginCommand):
         elif arguments.pull and arguments["DIRS"]:
             Git.execute_git_command(arguments["DIRS"], "pull", dryrun=arguments.dryrun)
 
+        elif arguments.status and arguments["DIRS"] and arguments.changed:
+            
+            Git.execute_git_command_filter(
+                    arguments["DIRS"], "status", dryrun=arguments.dryrun,
+                    does_not_contain="nothing to commit, working tree clean",
+                    verbose=arguments.verbose
+            )
+
         elif arguments.status and arguments["DIRS"]:
+
             Git.execute_git_command(
                 arguments["DIRS"], "status", dryrun=arguments.dryrun
             )
