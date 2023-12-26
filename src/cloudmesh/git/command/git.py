@@ -47,8 +47,8 @@ class GitCommand(PluginCommand):
                 git --refresh
                 git clone all [--force=no]
                 git pull all [--dryrun]
-                git pull [--dryrun] DIRS... 
-                git status [--dryrun] [--changed] [--verbose] DIRS... 
+                git pull [--dryrun] DIRS...
+                git status [--dryrun] [--changed] [--verbose] DIRS...
                 git upload
                 git log
                 git versions [--repo=REPO]
@@ -180,23 +180,20 @@ class GitCommand(PluginCommand):
                     > time_difference  : 2m 44s
                     > commits_after_tag: 1
 
-1. add branch on cms git versions
-
-
         """
         # arguments.FILE = arguments['--file'] or None
 
         map_parameters(
-            arguments, 
-            "fetch", 
+            arguments,
+            "fetch",
             "dryrun",
-            "changed", 
+            "changed",
             "verbose",
-            "move", 
-            "repo", 
-            "file", 
-            "title", 
-            "assignee"
+            "move",
+            "repo",
+            "file",
+            "title",
+            "assignee",
         )
         move = arguments.move or "move"
 
@@ -226,13 +223,15 @@ class GitCommand(PluginCommand):
                 print(f"{key:<{indent}}: {value}")
 
             if repo == ".":
-                if versions["commits_after_tag"]> 0:
-                    commits = Git.get_last_commit_messages(versions["commits_after_tag"])
+                if versions["commits_after_tag"] > 0:
+                    commits = Git.get_last_commit_messages(
+                        versions["commits_after_tag"]
+                    )
                     counter = 0
                     print()
                     for message in commits:
                         counter += 1
-                        
+
                         #    print(f"{counter}. {message}")
                         print(f"* {message}")
                     print()
@@ -472,15 +471,15 @@ class GitCommand(PluginCommand):
             Git.execute_git_command(arguments["DIRS"], "pull", dryrun=arguments.dryrun)
 
         elif arguments.status and arguments["DIRS"] and arguments.changed:
-            
             Git.execute_git_command_filter(
-                    arguments["DIRS"], "status", dryrun=arguments.dryrun,
-                    does_not_contain="nothing to commit, working tree clean",
-                    verbose=arguments.verbose
+                arguments["DIRS"],
+                "status",
+                dryrun=arguments.dryrun,
+                does_not_contain="nothing to commit, working tree clean",
+                verbose=arguments.verbose,
             )
 
         elif arguments.status and arguments["DIRS"]:
-
             Git.execute_git_command(
                 arguments["DIRS"], "status", dryrun=arguments.dryrun
             )
