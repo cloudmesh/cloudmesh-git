@@ -46,6 +46,7 @@ class GitCommand(PluginCommand):
                 git set ssh [DIRS]
                 git --refresh
                 git clone all [--force=no]
+                git clone cloudmesh REPO [--https]
                 git pull all [--dryrun]
                 git pull [--dryrun] DIRS...
                 git status [--dryrun] [--changed] [--verbose] DIRS...
@@ -98,6 +99,9 @@ class GitCommand(PluginCommand):
                     uses automatically ~/cloudmesh/git/repo-list.txt
                     which can be created with cms git list all.
                     if force is yes then it pulls preexisting directories.
+
+                git clone cloudmesh REPO [--https]
+                     clones cloudmesh-repo with ssh if not https is specified
 
                 git set ssh
                     Switches the repository to use ssh
@@ -379,6 +383,14 @@ class GitCommand(PluginCommand):
             writefile(html, tables)
             Shell.browser(html)
 
+        elif arguments.clone and arguments.cloudmesh:
+            repo = arguments["REPO"]
+            if arguments["--https"]:
+                location = f"https://github.com/cloudmesh/cloudmesh-{repo}.git"
+            else:
+                location = f"git@github.com:cloudmesh/cloudmesh-{repo}.git"
+            os.system(f"git clone {location}")
+            
         elif arguments.clone and arguments["all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             repos = readfile(filename).splitlines()
