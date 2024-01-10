@@ -390,7 +390,7 @@ class GitCommand(PluginCommand):
             else:
                 location = f"git@github.com:cloudmesh/cloudmesh-{repo}.git"
             os.system(f"git clone {location}")
-            
+
         elif arguments.clone and arguments["all"]:
             filename = path_expand("~/.cloudmesh/git_cache.txt")
             repos = readfile(filename).splitlines()

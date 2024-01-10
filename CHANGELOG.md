@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.0.8 - 5.0.5
+
+* add git cloudmesh clone command for a specific repo
+* change src/ to src in pyproject.toml
+* simplify readme generation that includes the manual page
+* use bumpversion also in pyproject.toml and do not do dynamic versions
+* add a filter command for status
+* simplify version management
+
 ## 5.0.4
 
 * add `cms git versions` printing the versions locally, from github and pypi
